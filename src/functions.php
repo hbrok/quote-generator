@@ -307,6 +307,17 @@
                     color: #' . $this->bg . ';
                     background-color: #' . $this->color . ';
                 }
+
+                a.button:hover {
+                    border-color: #' . $this->color . ';
+                    color: #' . $this->color . ';
+                }
+
+                a.button {
+                    border-color: #' . $this->color . ';
+                    background-color: #' . $this->color . ';
+                    color: #' . $this->bg . ';
+
             </style>';
 
             $this->css = $css;

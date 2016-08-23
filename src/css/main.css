@@ -72,10 +72,29 @@ body {
     background-color: rgba(0, 0, 0, 0.74);
 }
 
-
-footer.footer-main {
+.footer-main {
     background-color: rgba(0, 0, 0, 0.18);
     padding: 2rem 1rem;
     text-align: center;
     color: #efefef;
+}
+
+
+a.button {
+    padding: .5rem;
+    display: inline-block;
+    border: 2px solid #9ce4c0;
+    background-color: #9ce4c0;
+    color: #28504d;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all .2s;
+}
+
+a.button:hover {
+    background-color: transparent;
+}
+
+.new-quote {
+    text-align: center;
 }
