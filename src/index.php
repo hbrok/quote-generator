@@ -49,13 +49,6 @@
                 <a class="button" href="https://fonts.google.com/specimen/<?php urlencode( $site->get_font_name() ); ?>">
                     font
                 </a>
-
-                <!-- <br><br> -->
-                <!-- bg: <span class="color-background"><?php $site->get_hex('bg'); ?></span><br> -->
-                <!-- fg: <span class="color-foreground"><?php $site->get_hex('color'); ?></span><br> -->
-                <!-- font: <span class="font"><?php $site->get_font_name(); ?></span><br> -->
-                <!-- <br> -->
-
             </div>
         </main>
 

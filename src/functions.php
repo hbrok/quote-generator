@@ -257,8 +257,18 @@
             <style>
                 body {
                     background-color: #' . $this->bg . ';
-                    color: #' . $this->color . '
+                    color: #' . $this->color . ';
                 }
+
+                a {
+                    color: #' . $this->color . ';
+                }
+
+                a:hover {
+                    color: #' . $this->bg . ';
+                    background-color: #' . $this->color . ';
+                }
+
                 .quote-text {
                     font-family: "' . $this->font . '";
                 }
@@ -284,9 +294,18 @@
                     color: #' . $this->bg . ';
                 }
 
-                footer.footer-main {
+                .footer-main {
                     background: #' . $this->color . ';
                     color: #' . $this->bg . ';
+                }
+
+                .footer-main a {
+                    color: #' . $this->color . ';
+                }
+
+                .footer-main a:hover {
+                    color: #' . $this->bg . ';
+                    background-color: #' . $this->color . ';
                 }
             </style>';
 
