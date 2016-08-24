@@ -42,10 +42,10 @@
         public function get_hex( $type ) {
             // var_dump($type);
             if ( $type === 'bg' ) {
-                // var_dump( $this->bg);
-                echo str_replace( '#', '', $this->bg );
+                // var_dump( $this->color_one);
+                echo str_replace( '#', '', $this->color_one );
             } elseif ( $type === 'color' ) {
-                echo str_replace( '#', '', $this->color );
+                echo str_replace( '#', '', $this->color_two);
             }
         }
 
@@ -109,7 +109,7 @@
          */
         public function get_quote_link( $type = false ) {
             $base = 'http://' . $_SERVER['SERVER_NAME'] . '/src/';
-            $colors = 'bg=' . $this->bg . '&fg=' . $this->color;
+            $colors = 'bg=' . $this->color_one . '&fg=' . $this->color;
             $quote = 'quote=' . urlencode( $this->quote->quoteText ) . '&author=' . urlencode( $this->quote->quoteAuthor );
             $font = 'font=' . urlencode( $this->font );
 
@@ -229,8 +229,8 @@
         protected function set_css( $foreground = false, $background = false ) {
             if ( $foreground && $background ) {
                 // Get specific colors.
-                $this->bg = $background;
-                $this->color = $foreground;
+                $this->color_one = $background;
+                $this->color_two= $foreground;
             } else {
                 // Get random colors.
                 $a11y_stats = file_get_contents( 'http://www.randoma11y.com/stats/' );
@@ -249,75 +249,53 @@
                 $this->color_id = $first['id'];
                 // var_dump($this->color_id);
 
-                $this->bg = str_replace( '#', '', $first['color_one'] );
-                $this->color = str_replace( '#', '', $first['color_two'] );
+                $this->color_one = str_replace( '#', '', $first['color_one'] );
+                $this->color_two = str_replace( '#', '', $first['color_two'] );
             }
 
             $css = '
             <style>
-                body {
-                    background-color: #' . $this->bg . ';
-                    color: #' . $this->color . ';
-                }
-
-                a {
-                    color: #' . $this->color . ';
-                }
-
-                a:hover {
-                    color: #' . $this->bg . ';
-                    background-color: #' . $this->color . ';
-                }
-
                 .quote-text {
                     font-family: "' . $this->font . '";
                 }
 
-                .quote-link {
-                    color: #' . $this->bg . ';
-                    background-color: #' . $this->color . ';
+                a:hover,
+                .quote-link,
+                ::selection,
+                .button,
+                .button.hollow:hover {
+                    color: #' . $this->color_one . ';
                 }
 
+                body,
                 .quote-link:hover {
-                    color: #' . $this->color . ';
-                    background-color: #' . $this->bg . ';
+                    background-color: #' . $this->color_one . ';
                 }
 
-                footer.footer-main {
-                    background-color: rgba(0, 0, 0, 0.18);
-                    color: #' . $this->color . ';
+                body,
+                a,
+                .quote-link:hover,
+                .button:hover,
+                .button.hollow,
+                .footer {
+                    color: #' . $this->color_two. ';
                 }
 
-                ::selection {
-                    background: #' . $this->color . ';
-                    text-shadow: none;
-                    color: #' . $this->bg . ';
+                body,
+                .actions,
+                .footer,
+                .button:hover,
+                .button.hollow {
+                    border-color: #' . $this->color_two. ';
                 }
 
-                .footer-main {
-                    background: #' . $this->color . ';
-                    color: #' . $this->bg . ';
+                a:hover,
+                .quote-link,
+                ::selection,
+                .button,
+                .button.hollow:hover {
+                    background-color: #' . $this->color_two. ';
                 }
-
-                .footer-main a {
-                    color: #' . $this->color . ';
-                }
-
-                .footer-main a:hover {
-                    color: #' . $this->bg . ';
-                    background-color: #' . $this->color . ';
-                }
-
-                a.button:hover {
-                    border-color: #' . $this->color . ';
-                    color: #' . $this->color . ';
-                }
-
-                a.button {
-                    border-color: #' . $this->color . ';
-                    background-color: #' . $this->color . ';
-                    color: #' . $this->bg . ';
-
             </style>';
 
             $this->css = $css;
