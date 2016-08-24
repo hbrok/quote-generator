@@ -16,42 +16,38 @@
 
         <?php $site->get_css(); ?>
     </head>
+
     <body>
-
-        <header class="main-header">
-
-        </header>
-
         <main class="main-content">
             <blockquote class="quote">
                 <p class="quote-text"><?php $site->get_quote(); ?></p>
-              <footer class="quote-attribution">
-                  <a class="button" href="<?php $site->get_link(); ?>">
-                      <span class="quote-author"><?php $site->get_author(); ?></span>
-                  </a>
-              </footer>
-              <a href="<?php $site->get_quote_link(); ?>">link</a> |
-              <a href="<?php $site->get_link(); ?>">source</a> |
-              <a href="https://fonts.google.com/specimen/<?php urlencode( $site->get_font_name() ); ?>">font</a>
+                <footer class="quote-attribution">
+                    <a class="button" href="<?php $site->get_link(); ?>">
+                        <span class="quote-author"><?php $site->get_author(); ?></span>
+                    </a>
+                </footer>
+                <a href="<?php $site->get_quote_link(); ?>">link</a> |
+                <a href="<?php $site->get_link(); ?>">source</a> |
+                <a href="https://fonts.google.com/specimen/<?php urlencode( $site->get_font_name() ); ?>">font</a>
             </blockquote>
 
             <div class="actions">
                 <p>Generate a new quote:</p>
-                <a class="button hollow color-two" href="<?php $site->get_quote_link('font'); ?>">New Font</a>
-                <a class="button hollow color-two" href="<?php $site->get_quote_link('colors'); ?>">New Colors</a>
-                <a class="button hollow color-two" href="<?php $site->get_quote_link('quote'); ?>">New Quote</a>
+                <a class="button hollow" href="<?php $site->get_quote_link('font'); ?>">New Font</a>
+                <a class="button hollow" href="<?php $site->get_quote_link('colors'); ?>">New Colors</a>
+                <a class="button hollow" href="<?php $site->get_quote_link('quote'); ?>">New Quote</a>
 
                 <p>What do you think about this accessible color combination?</p>
-                <a class="button color-one small" href="http://randoma11y.com/#/?hex=<?php $site->get_hex('bg'); ?>&compare=<?php $site->get_hex('color'); ?>">Vote on these colors</a>
+                <a class="button" href="http://randoma11y.com/#/?hex=<?php $site->get_hex('color_one'); ?>&compare=<?php $site->get_hex('color_two'); ?>">Vote on these colors</a>
             </div>
         </main>
 
         <footer class="footer">
-          <p class="colophon">
-              Colors: <a href="http://www.randoma11y.com/">randoma11y.com</a> |
-              Quotes: <a href="http://forismatic.com/">forismatic.com</a><br>
-              Made for <a href="https://a-k-apart.com/">10k Apart</a>
-          </p>
+            <p class="colophon">
+                Colors: <a href="http://www.randoma11y.com/">randoma11y.com</a> |
+                Quotes: <a href="http://forismatic.com/">forismatic.com</a><br>
+                Made for <a href="https://a-k-apart.com/">10k Apart</a>
+            </p>
         </footer>
     </body>
 </html>

@@ -27,11 +27,7 @@ body {
     transition: all .2s;
 }
 
-.button:hover {
-    border: 2px solid;
-    background-color: transparent;
-}
-
+.button:hover,
 .button.hollow {
     border: 2px solid;
     background-color: transparent;
