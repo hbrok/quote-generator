@@ -28,7 +28,7 @@
                 </footer>
                 <a href="<?php $site->get_quote_link(); ?>">link</a> |
                 <a href="<?php $site->get_link(); ?>">source</a> |
-                <a href="https://fonts.google.com/specimen/<?php urlencode( $site->get_font_name() ); ?>">font</a>
+                <a href="https://fonts.google.com/specimen/<?php $site->get_font_name( true ); ?>">font</a>
             </blockquote>
 
             <div class="actions">

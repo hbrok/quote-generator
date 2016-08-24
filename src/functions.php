@@ -87,13 +87,11 @@
          * Echoes URL to Google font.
          */
         public function get_google_font() {
-            $font_name = urlencode( $this->font );
-            $text = urlencode( $this->get_unique_chars() );
-            echo 'https://fonts.googleapis.com/css?family=' . $font_name . '&text=' . $text . '&subset=latin';
+            echo 'https://fonts.googleapis.com/css?family=' .urlencode( $this->font ) . '&text=' . urlencode( $this->get_unique_chars() ) . '&subset=latin';
         }
 
         /**
-         * Echos CSS with all colors.
+         * Echos CSS with dynamic colors.
          */
         public function get_css() {
             echo $this->css;
@@ -140,8 +138,8 @@
         }
 
         /**
-         * Gets the unqiue characters in a quote so only characters that are
-         * needed will be in the google font.
+         * Gets the unqiue characters in teh quoteText so we can request a
+         * subset of a font from Google.
          *
          * @return string $chars All unqiue chars in a string that can be passed to google fonts api.
          */
@@ -151,9 +149,10 @@
             return $chars;
         }
 
-
         /**
          * Gets random quote from forismatic.com API.
+         * @param bool|string $quoteText Quote text.
+         * @param bool|string $quoteAuthor Quote author.
          */
         protected function random_quote( $quoteText = false, $quoteAuthor = false ) {
             if ( $quoteText && $quoteAuthor ) {
@@ -164,28 +163,30 @@
                 return $this->quote;
             } else {
                 // TODO: Sometimes a NULL result is returned, figure out how to stop this.
-                $arrContextOptions = array(
-                    "ssl" => array(
-                        "verify_peer" => false,
-                        "verify_peer_name" => false,
+                $context_options = array(
+                    'ssl' => array(
+                        'verify_peer'      => false,
+                        'verify_peer_name' => false,
                     ),
                 );
 
+                // Get random quote from Forismatic API.
                 $url = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
-
-                $results = file_get_contents( $url, false, stream_context_create( $arrContextOptions ) );
+                $results = file_get_contents( $url, false, stream_context_create( $context_options ) );
                 $results = json_decode( $results );
 
-                var_dump( $results->quoteAuthor );
-                var_dump( isset( $results->quoteAuthor ) );
-                echo '<br>';
-                var_dump( $results->quoteText );
-                var_dump( isset( $results->quoteText ) );
+                // var_dump( $results->quoteAuthor );
+                // var_dump( isset( $results->quoteAuthor ) );
+                // echo '<br>';
+                // var_dump( $results->quoteText );
+                // var_dump( isset( $results->quoteText ) );
 
                 if ( isset( $results->quoteAuthor ) ) {
+                    // Reuturn results if successful.
                     $this->quote = $results;
                     return $this->quote;
                 } else {
+                    // If author or quote is empty, try again.
                     return $this->random_quote();
                 }
             }
@@ -193,22 +194,21 @@
 
         protected function set_font( $font_name = false ) {
             // This is hacky, so probably shouldn't do it like this.
-            $arrContextOptions = array(
-                "ssl" => array(
-                    "verify_peer" => false,
-                    "verify_peer_name" => false,
+            $context_options = array(
+                'ssl' => array(
+                    'verify_peer'      => false,
+                    'verify_peer_name' => false,
                 ),
             );
 
             // $url = 'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyD02NoBU2DFMfsCIXMq_Rrt9SvO7a-6xNg';
             $url = 'font-list.json';
 
-            $fonts = file_get_contents( $url, false, stream_context_create( $arrContextOptions ) );
+            $fonts = file_get_contents( $url, false, stream_context_create( $context_options ) );
             $fonts = json_decode( $fonts, true );
             $fonts_list = $fonts['items'];
 
             if ( $font_name ) {
-
                 foreach ( $fonts_list as $font) {
                     if ( $font['family'] === urldecode( $_GET['font'] ) ) {
                         $this->font = $font_name;
