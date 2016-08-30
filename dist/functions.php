@@ -232,8 +232,17 @@
                 $this->color_one = $background;
                 $this->color_two= $foreground;
             } else {
+                // This is hacky, so probably shouldn't do it like this.
+                $arrContextOptions = array(
+                    "ssl" => array(
+                        "verify_peer" => false,
+                        "verify_peer_name" => false,
+                    ),
+                );
+
                 // Get random colors.
-                $a11y_stats = file_get_contents( 'http://www.randoma11y.com/stats/' );
+                $url = 'http://www.randoma11y.com/stats/';
+                $a11y_stats = file_get_contents( $url, false, stream_context_create( $arrContextOptions ));
                 $a11y_stats = json_decode( $a11y_stats, true );
                 $count = $a11y_stats['combos'];
 

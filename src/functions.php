@@ -234,14 +234,25 @@
                 $this->color_one = $color_one;
                 $this->color_two = $color_two;
             } else {
+                // This is hacky, so probably shouldn't do it like this.
+                $arrContextOptions = array(
+                    "ssl" => array(
+                        "verify_peer" => false,
+                        "verify_peer_name" => false,
+                    ),
+                );
+
                 // Get random colors.
-                $a11y_stats = file_get_contents( 'http://www.randoma11y.com/stats/' );
+                $url = 'http://www.randoma11y.com/stats/';
+                $a11y_stats = file_get_contents( $url, false, stream_context_create( $arrContextOptions ) );
                 $a11y_stats = json_decode( $a11y_stats, true );
                 $count = $a11y_stats['combos'];
 
                 $color_index = rand( 1, $count );
 
-                $a11y_color = file_get_contents('http://randoma11y.com/combos?page=' . $color_index . '&per_page=1' );
+
+                $url = 'http://randoma11y.com/combos?page=' . $color_index . '&per_page=1';
+                $a11y_color = file_get_contents( $url, false, stream_context_create( $arrContextOptions ) );
                 $a11y_color = json_decode( $a11y_color, true );
 
                 // var_dump( $a11y_color );
