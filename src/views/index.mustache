@@ -24,8 +24,14 @@
 
         <!-- Dynamic CSS. -->
         <style>
+            :root {
+              --colorone: #{{ color_one }};
+              --colortwo: #{{ color_two }};
+              --font: {{ font }};
+              /*--blur: 10px;*/
+            }
             .quote-text {
-                font-family: "{{ font }}";
+                font-family: var(--font);
             }
 
             a:hover,
@@ -33,12 +39,14 @@
             ::selection,
             .button,
             .button.hollow:hover {
-                color: #{{ color_one }};
+                /*color: #{{ color_one }};*/
+                color: var(--colorone);
             }
 
             body,
             .quote-link:hover {
-                background-color: #{{ color_one }};
+                /*background-color: #{{ color_one }};*/
+                background-color: var(--colorone);
             }
 
             body,
@@ -47,7 +55,8 @@
             .button:hover,
             .button.hollow,
             .footer {
-                color: #{{ color_two }};
+                /*color: #{{ color_two }};*/
+                color: var(--colortwo);
             }
 
             body,
@@ -55,7 +64,9 @@
             .footer,
             .button:hover,
             .button.hollow {
-                border-color: #{{ color_two }};
+                /*border-color: #{{ color_two }};*/
+                border-color: var(--colortwo);
+
             }
 
             a:hover,
@@ -63,7 +74,8 @@
             ::selection,
             .button,
             .button.hollow:hover {
-                background-color: #{{ color_two }};
+                /*background-color: #{{ color_two }};*/
+                background-color: var(--colortwo);
             }
         </style>
     </head>
@@ -105,6 +117,8 @@
         <script>
             // console.log('hi');
 
+            // HELPER FUNCTIONS
+
             /**
              * foreach function for querySelectorAll elements.
              */
@@ -131,16 +145,37 @@
                 return arr;
             }
 
+
+            /**
+             * Returns a random integer between min (included) and max (included)
+             * Using Math.round() will give you a non-uniform distribution!
+             * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#Examples
+             */
+            function getRandomInt(min, max) {
+              min = Math.ceil(min);
+              max = Math.floor(max);
+              return Math.floor(Math.random() * (max - min)) + min;
+            }
+
+
+            ///////////////////
+
+            // THE REAL STUFF
+
             // Set default font.
-            var font = document.querySelector('body').getAttribute('data-font');
+            var font = document.documentElement.style.getPropertyValue('--font');
+
+            // XMLHttpRequest type.
+            var invocation = new XMLHttpRequest();
             var requestType = '';
 
-            var pokeApiUrl = 'http://pokeapi.co/api/v2/ability/4/';
+            // Caches.
+            var colorCache = [];
+            var fontCache = [];
+
+            // API URLs/info.
             var randoma11yUrl = 'http://www.randoma11y.com/stats/';
             var forismaticUrl = 'https://crossorigin.me/http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
-
-            // var favsUrl = 'https://favqs.com/api/quotes';
-            // var favsToken = 'c518ff9cd8895ad60675ccd57ed4fe8b';
 
             var fontsUrl = '/src/font-list.json';
 
@@ -148,54 +183,69 @@
             var colorsURL = 'http://www.randoma11y.com/stats/';
             var colorsPageURL = 'http://randoma11y.com/combos?';
 
-
+            // Buttons.
             var quoteText = document.getElementById('js-quote-text');
             var quoteAuthor = document.getElementById('js-quote-author');
             var quoteLink = document.getElementById('js-quote-link');
-
-
-
             var buttons = document.querySelectorAll('.button');
 
-            forEach(buttons, function (index, value) {
+            // Prevent link clicking for all buttons.
+            // forEach(buttons, function (index, value) {
             //   console.log(index, value); // passes index + value back!
-              buttons[index].addEventListener('click', function(e){ //say this is an anchor
+            //   buttons[index].addEventListener('click', function(e){ //say this is an anchor
                        //do something
-                      e.preventDefault();
-                 });
-            });
+                    //   e.preventDefault();
+                //  });
+            // });
 
-
+            // Set functions for 'Get New Font' button.
             var newFont = document.getElementById('js-new-font');
             // console.log(newFont);
             newFont.addEventListener('click', function(e) {
-                requestType = 'font';
-                callOtherDomain( fontsUrl );
+                e.preventDefault();
+
+                // Send new request if cache is empty, or load from cache.
+                if (fontCache.length === 0) {
+                    console.log('1');
+                    requestType = 'font';
+                    callOtherDomain( fontsUrl );
+                } else if (fontCache.length > 0) {
+                    console.log('2');
+                    getNewFont();
+                }
             });
 
 
-
+            // 'Get New Quote' button.
             var newQuote = document.getElementById('js-new-quote');
             // console.log(newQuote);
             newQuote.addEventListener('click', function(e) {
+                e.preventDefault();
+
                 requestType = 'quote';
                 callOtherDomain( forismaticUrl );
             });
 
+            // 'Get New Colors' button.
             var newColors = document.getElementById('js-new-colors');
             // console.log(newQuote);
             newColors.addEventListener('click', function(e) {
-                requestType = 'colors';
-                callOtherDomain( colorsPageURL );
+                e.preventDefault();
+                
+                // Send new request if cache is empty, or load from cache.
+                if (colorCache.length === 0) {
+                    requestType = 'colors';
+                    callOtherDomain( colorsPageURL );
+                } else if (colorCache.length > 0) {
+                    getNewColors();
+                }
             });
 
 
 
 
-            var invocation = new XMLHttpRequest();
-
             function callOtherDomain( url ) {
-                if(invocation) {
+                if (invocation) {
                     invocation.open('GET', url, true);
                     invocation.onreadystatechange = handler;
                     invocation.send();
@@ -203,50 +253,37 @@
             }
 
             function handler( evtXHR ) {
-                // console.log(invocation.status);
-
                 if (invocation.readyState === XMLHttpRequest.DONE) {
                     if (invocation.status === 200) {
-
-                        // var response = invocation.responseText;
-                        // response = response.replace('\'', ''); // todo figure this out.....
-                        // console.log(response);
-                        // response = JSON.parse(response);
-
+                        // Get response and replace escaped single quotes with
+                        // unescaped single quotes. (Forismatic escapes single
+                        // quotes in their JSON response, however that is not
+                        // valid JSON).
                         var response = JSON.parse(invocation.responseText.replace("\\'", "'"));
-                        // console.log(response);
 
+                        // Different functions based on which button was pressed.
                         switch (requestType) {
                             case 'quote':
-                                quoteText.innerHTML = response.quoteText;
-                                quoteAuthor.innerHTML = response.quoteAuthor;
-                                getNewFont();
+                                // Get new quote from response.
+                                getNewQuote(response);
                                 break;
 
                             case 'font':
-                                var numFonts = response.items.length;
-                                font = response.items[getRandomInt(0, numFonts)].family;
+                                // Set font cache, and get new font.
+                                fontCache = response.items;
                                 getNewFont();
                                 break;
 
                             case 'colors':
-                                console.log(response);
-                                var numPairs = response.length;
-                                var pair = response[getRandomInt(0, numPairs)];
-                                var colorOne = pair.color_one;
-                                var colorTwo = pair.color_two;
-                                console.log(colorOne);
-                                console.log(colorTwo);
+                                // Set color cache and get new colors.
+                                colorCache = response;
+                                getNewColors();
                                 break;
 
                             default:
                                 alert('No request type set.');
                                 break;
                         }
-
-
-                        // quote = response;
-
                     } else {
                         alert('There was a problem with the request.');
                     }
@@ -255,18 +292,42 @@
             }
 
 
-            function getNewFont(response) {
-                console.log(response);
-                // console.log(response.items.length);
-                console.log(font);
+            function getNewQuote(response) {
+                // Set new quote, and characters needed for it.
+                quoteText.innerHTML = response.quoteText;
                 loadFont(font);
-                quoteText.style.fontFamily = font;
+
+                // Don't display blank author.
+                if (response.quoteAuthor.length > 0)
+                    quoteAuthor.innerHTML = response.quoteAuthor;
+                else
+                    quoteAuthor.innerHTML = 'Anonymous';
+            }
+
+
+            function getNewColors() {
+                // Get random color pairing.
+                var numColorPairs = colorCache.length;
+                var pair = colorCache[getRandomInt(0, numColorPairs)];
+                var colorOne = pair.color_one;
+                var colorTwo = pair.color_two;
+
+                // Set new color CSS vars on root.
+                document.documentElement.style.setProperty('--colorone', colorOne);
+                document.documentElement.style.setProperty('--colortwo', colorTwo);
+            }
+
+
+            function getNewFont() {
+                font = fontCache[getRandomInt(0, fontCache.length)].family;
+                loadFont(font);
+                document.documentElement.style.setProperty('--font', font);
             }
 
 
             function getUniqueChars() {
-                console.log(quoteText.innerHTML);
-                console.log(unique(quoteText.innerHTML).join(''));
+                // console.log(quoteText.innerHTML);
+                // console.log(unique(quoteText.innerHTML).join(''));
                 return unique(quoteText.innerHTML).join('');
             }
 
@@ -287,23 +348,6 @@
                   s.parentNode.insertBefore(wf, s);
                })(document);
             };
-
-
-            /**
-             * Returns a random integer between min (included) and max (included)
-             * Using Math.round() will give you a non-uniform distribution!
-             * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#Examples
-             */
-            function getRandomInt(min, max) {
-              min = Math.ceil(min);
-              max = Math.floor(max);
-              return Math.floor(Math.random() * (max - min)) + min;
-            }
-
-
-
-
-
 
         </script>
     </body>
