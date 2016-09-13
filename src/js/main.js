@@ -12,6 +12,9 @@ var App = (function () {
     var bodyStyles = window.getComputedStyle(document.body);
     var font = bodyStyles.getPropertyValue('--font');
 
+    var colorOne = bodyStyles.getPropertyValue('--colorone');
+    var colorTwo = bodyStyles.getPropertyValue('--colortwo');
+
     // API URLs/info.
     var combos = 113592;
     var colorsURL = 'http://www.randoma11y.com/stats/';
@@ -24,6 +27,10 @@ var App = (function () {
     var quoteText = document.getElementById('js-quote-text');
     var quoteAuthor = document.getElementById('js-quote-author');
     var quoteLink = document.getElementById('js-quote-link');
+
+    var quoteSource = document.getElementById('js-quote-source');
+
+    var fontLink = document.getElementById('js-font-link');
 
     var newFont = document.getElementById('js-new-font');
     var newQuote = document.getElementById('js-new-quote');
@@ -162,6 +169,26 @@ var App = (function () {
     };
 
 
+    var _generateQuoteLink = function () {
+        // Get new colors wihtout # in front..
+        colorOne = bodyStyles.getPropertyValue('--colorone');
+        colorOne = colorOne.slice(1);
+
+        colorTwo = bodyStyles.getPropertyValue('--colortwo');
+        colorTwo = colorTwo.slice(1);
+
+        var base = 'http://' + window.location.hostname + '/src/?';
+        var colors = 'bg=' + colorOne + '&fg=' + colorTwo;
+        //console.log(quoteLink);
+        var quote = '&quote=' + quoteText.innerHTML + '&author=' + quoteAuthor.innerHTML + '&id=' + quoteLink.getAttribute('href').slice(quoteLink.getAttribute('href').length - 11, quoteLink.getAttribute('href').length - 1);
+        var font = '&font=' + font;
+
+        var link = encodeURI(base + colors + quote + font);
+
+        quoteSource.setAttribute('href', link);
+    };
+
+
     // TODO: Coda Caption, fonts with only bold styles aren giving an error when not being called with the correct font weight, so we need to also get the (first?) font weight available so they show up. OR only use the font if it has the normal 300/400 default weight....
 // Load a Google font by name.
     var _loadFont = function (font) {
@@ -177,7 +204,7 @@ var App = (function () {
     };
 
 
-    function getNewQuote(response) {
+    var getNewQuote = function(response) {
         // Set new quote, and characters needed for it.
         quoteText.innerHTML = response.quoteText;
         _loadFont(font);
@@ -188,34 +215,42 @@ var App = (function () {
             quoteAuthor.innerHTML = response.quoteAuthor;
         else
             quoteAuthor.innerHTML = 'Anonymous';
-    }
+
+        quoteLink.setAttribute('href', response.quoteLink);
+        _generateQuoteLink();
+    };
 
 
-    function getNewColors() {
+    var getNewColors = function() {
         // Get random color pairing.
         var numColorPairs = colorCache.length;
         var pair = colorCache[_getRandomInt(0, numColorPairs)];
-        var colorOne = pair.color_one;
-        var colorTwo = pair.color_two;
+        colorOne = pair.color_one;
+        colorTwo = pair.color_two;
 
         // Set new color CSS vars on root.
-        document.documentElement.style.setProperty('--colorone', colorOne);
-        document.documentElement.style.setProperty('--colortwo', colorTwo);
+        document.documentElement.style.setProperty('--colorone', colorOne, '');
+        document.documentElement.style.setProperty('--colortwo', colorTwo, '');
 
         // Update color voting link. Remove # from colors.
         var voteButton = document.getElementById('js-colors-vote-link');
         voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne.slice(1) + '&compare=' + colorTwo.slice(1));
-    }
+        _generateQuoteLink();
+    };
 
 
-    function getNewFont() {
+    var getNewFont = function() {
         font = fontCache[_getRandomInt(0, fontCache.length)].family;
         _loadFont(font);
-        document.documentElement.style.setProperty('--font', font);
-    }
+        document.documentElement.style.setProperty('--font', font, '');
+        fontLink.setAttribute('href', 'https://fonts.google.com/specimen/' + font);
+        _generateQuoteLink();
+    };
 
     return {
         init: init,
-        getNewQuote: getNewQuote
+        getNewQuote: getNewQuote,
+        getNewColors: getNewColors,
+        getNewFont: getNewFont
     }
 }());

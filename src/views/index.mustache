@@ -74,9 +74,9 @@
             <blockquote class="quote">
                 <p id="js-quote-text" class="quote-text">{{ quote.quoteText }}</p>
                 <footer class="quote-attribution">
-                    <a class="button" href="{{ quote.quoteLink }}">
-                        <span id="js-quote-author" class="quote-author">{{ quote.quoteAuthor }}</span>
-                    </a>
+                    <cite><a id="js-quote-link" class="button" href="{{ quote.quoteLink }}">
+                        <span id="js-quote-author" class="quote-author">— {{ quote.quoteAuthor }}</span>
+                    </a></cite>
                 </footer>
             </blockquote>
 
@@ -94,8 +94,8 @@
         <footer class="footer">
             <p class="colophon">
               Sources:
-              <a id="js-quote-link" href="{{ quote.quoteLink }}">quote</a> |
-              <a href="https://fonts.google.com/specimen/{{ font | urlencode }}">font</a>
+              <a id="js-quote-source" href="{{ quoteLink.all }}">quote</a> |
+              <a id="js-font-link" href="https://fonts.google.com/specimen/{{ font }}">font</a>
                 <br><br>
                 Colors: <a href="http://www.randoma11y.com/">randoma11y.com</a> |
                 Quotes: <a href="http://forismatic.com/">forismatic.com</a><br>

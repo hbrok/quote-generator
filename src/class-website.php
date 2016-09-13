@@ -9,31 +9,32 @@ class WebSite {
     public $quoteLink;
 
     public function __construct() {
-        // $this->set_font();
-        if ( isset( $_GET['quote'] ) && isset( $_GET['author'] ) ) {
-            // echo 'QUOTE: ' . $_GET['quote'] . '<br>';
-            // echo 'AUTHOR: ' . $_GET['author'] . '<br>';
-            $this->quote = $this->random_quote( $_GET['quote'], $_GET['author']);
+        // TODO: Move $_GET stuff to function.
+        // Rename function to getQuote... it's not always getting a random quote.
+        if ( isset( $_GET['quote'] ) && isset( $_GET['author'] ) && isset( $_GET['id'] ) ) {
+            $this->quote = $this->random_quote( $_GET['quote'], $_GET['author'], $_GET['id'] );
         } else {
             $this->quote = $this->random_quote();
         }
 
-        if ( isset( $_GET['font'] ) ) {
-            // echo 'FONT: ' . $_GET['font'] . '<br>';
-            $this->set_font( $_GET['font'] );
-        } else {
-            $this->set_font();
-        }
+        // Set font from GET variable, or get a random font.
+        $this->set_font();
+//        var_dump( $this->font );
 
+
+        // TODO: Move $_GET stuff to the function.
+        // Rename function??
         if ( isset( $_GET['bg'] ) && isset( $_GET['fg'] ) ) {
-            // echo 'FG: ' . $_GET['fg'] . '<br>';
-            // echo 'BG: ' . $_GET['bg'] . '<br>';
             $this->set_css( $_GET['fg'], $_GET['bg'] );
         } else {
             $this->set_css();
         }
 
         $this->get_quote_link();
+//        var_dump( $this->quote->quoteAuthor );
+//        var_dump( $this->quote->quoteText );
+//        var_dump( $this->quote->quoteLink );
+//        var_dump( $this->quote );
     }
 
     /**
@@ -84,10 +85,13 @@ class WebSite {
         $quote = 'quote=' . urlencode( $this->quote->quoteText ) . '&author=' . urlencode( $this->quote->quoteAuthor );
         $font = 'font=' . urlencode( $this->font );
 
+        // Get the 10 char id, so we can link to the source URL, if the quote text/author is set.
+        $id = 'id=' . substr( $this->quote->quoteLink, count( $this->quote->quoteLink ) - 12, 10 );
+
         $this->quoteLink['colors'] = $base . '?' . $font . '&' . $quote;
         $this->quoteLink['font'] = $base . '?' . $colors . '&' . $quote;
-        $this->quoteLink['quote'] = $base . '?' . $font . '&' . $colors;
-        $this->quoteLink['all'] = $base . '?' . $font . '&' . $colors . '&' . $quote;
+        $this->quoteLink['quote'] = $base . '?' . $font . '&' . $colors . '&' . $id;
+        $this->quoteLink['all'] = $base . '?' . $font . '&' . $colors . '&' . $quote . '&' . $id;
     }
 
     /**
@@ -107,11 +111,13 @@ class WebSite {
     /**
      * Gets random quote from forismatic.com API.
      */
-    protected function random_quote( $quoteText = false, $quoteAuthor = false ) {
-        if ( $quoteText && $quoteAuthor ) {
+    protected function random_quote( $quoteText = false, $quoteAuthor = false, $quoteLink = false ) {
+        if ( $quoteText && $quoteAuthor && $quoteLink ) {
+//        if ( $quoteText && $quoteAuthor && $quoteLink ) {
             $quote = new stdClass();
             $quote->quoteText = urldecode( $quoteText );
             $quote->quoteAuthor = urldecode( $quoteAuthor );
+            $quote->quoteLink = urldecode( $quoteLink );
             $this->quote = $quote;
             return $this->quote;
         } else {
@@ -143,7 +149,7 @@ class WebSite {
         return $results;
     }
 
-    protected function set_font( $font = false ) {
+    protected function set_font() {
         // This is hacky, so probably shouldn't do it like this.
         $arrContextOptions = array(
             "ssl" => array(
@@ -159,25 +165,20 @@ class WebSite {
         $fonts = json_decode( $fonts, true );
         $fonts_list = $fonts['items'];
 
-        if ( $font ) {
-
-            foreach ( $fonts_list as $font) {
+        if ( isset( $_GET['font'] ) ) {
+            foreach ( $fonts_list as $font ) {
                 if ( $font['family'] === urldecode( $_GET['font'] ) ) {
                     $this->font = $font['family'];
-                    // var_dump($font);
-                    break;
                 }
             }
         } else {
             $rand = rand( 0, count( $fonts_list ) );
-
-            $font = $fonts_list[$rand]['family'];
-
-            $this->font = $font;
+            $this->font = $fonts_list[$rand]['family'];
         }
 
+//        var_dump( $this->set_font() );
 
-        return $font;
+        return $this->font;
     }
 
 

@@ -11,6 +11,7 @@ body {
     min-height: 100vh;
     border-top: 10px solid;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    transition: background-color .3s;
 }
 
 ::selection {
@@ -53,6 +54,12 @@ body {
 .quote-text {
     font-size: 3rem;
     line-height: 1.25;
+    opacity: 1;
+    transition: opacity .3s;
+}
+
+.wf-loading .quote-text {
+    opacity: 0;
 }
 
 .quote-attribution {
