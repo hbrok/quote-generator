@@ -9,11 +9,25 @@ var App = (function () {
     var fontCache = [];
 
     // Font.
-    var bodyStyles = window.getComputedStyle(document.body);
-    var font = bodyStyles.getPropertyValue('--font');
+    //var bodyStyles = document.documentElement.style;
+    var bodyStyles = getComputedStyle(document.documentElement);
+    var font = bodyStyles.getPropertyValue('--font').trim();
+    console.log(font);
 
-    var colorOne = bodyStyles.getPropertyValue('--colorone');
-    var colorTwo = bodyStyles.getPropertyValue('--colortwo');
+    //var colorOne = bodyStyles.getPropertyValue('--colorone');
+    //var colorTwo = bodyStyles.getPropertyValue('--colortwo');
+
+
+    //console.log(bodyStyles);
+    //console.log(document.documentElement.style);
+
+    //var quoteStyles = getComputedStyle(document.getElementById('js-quote-text'));
+    //console.log(quoteStyles);
+    //console.log(quoteStyles.getPropertyValue('font-family'));
+    //console.log(bodyStyles);
+    //console.log(colorOne);
+    //console.log(colorTwo);
+    //console.log(font);
 
     // API URLs/info.
     var combos = 113592;
