@@ -43,6 +43,12 @@ var App = (function () {
     var init = function () {
         stylesheet = document.styleSheets[2];
         font = stylesheet.cssRules[0].style.fontFamily;
+        colorOne = stylesheet.cssRules[1].style.color;
+        colorTwo = stylesheet.cssRules[3].style.color;
+
+        console.log(font);
+        console.log(colorOne);
+        console.log(colorTwo);
 
         // TODO: set default colorOne and colorTwo here too, if needed.
 
@@ -203,11 +209,11 @@ var App = (function () {
      */
     var _generateQuoteLink = function () {
         // Get new colors wihtout # in front..
-        colorOne = bodyStyles.getPropertyValue('--colorone');
-        colorOne = colorOne.slice(1);
-
-        colorTwo = bodyStyles.getPropertyValue('--colortwo');
-        colorTwo = colorTwo.slice(1);
+        //colorOne = bodyStyles.getPropertyValue('--colorone');
+        //colorOne = colorOne.slice(1);
+        //
+        //colorTwo = bodyStyles.getPropertyValue('--colortwo');
+        //colorTwo = colorTwo.slice(1);
 
         // TODO: Get colors from cssstylesheet...
 
