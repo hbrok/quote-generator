@@ -11,16 +11,10 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family={{ font }}&text={{ unique_chars }}&subset=latin">
 
-        <!-- Dynamic CSS. -->
+        <!-- Starting Dynamic CSS. -->
         <style>
-            :root {
-              --colorone: #{{ color_one }};
-              --colortwo: #{{ color_two }};
-              --font: '{{ font }}';
-            }
-
             .quote-text {
-                font-family: var(--font);
+                font-family: {{ font }};
             }
 
             a:hover,
@@ -28,14 +22,12 @@
             ::selection,
             .button,
             .button.hollow:hover {
-                /*color: #{{ color_one }};*/
-                color: var(--colorone);
+                color: #{{ color_one }};
             }
 
             body,
             .quote-link:hover {
-                /*background-color: #{{ color_one }};*/
-                background-color: var(--colorone);
+                background-color: #{{ color_one }};
             }
 
             body,
@@ -44,8 +36,7 @@
             .button:hover,
             .button.hollow,
             .footer {
-                /*color: #{{ color_two }};*/
-                color: var(--colortwo);
+                color: #{{ color_two }};
             }
 
             body,
@@ -53,8 +44,7 @@
             .footer,
             .button:hover,
             .button.hollow {
-                /*border-color: #{{ color_two }};*/
-                border-color: var(--colortwo);
+                border-color: #{{ color_two }};
 
             }
 
@@ -63,8 +53,7 @@
             ::selection,
             .button,
             .button.hollow:hover {
-                /*background-color: #{{ color_two }};*/
-                background-color: var(--colortwo);
+                background-color: #{{ color_two }};
             }
         </style>
     </head>
@@ -74,9 +63,11 @@
             <blockquote class="quote">
                 <p id="js-quote-text" class="quote-text">{{ quote.quoteText }}</p>
                 <footer class="quote-attribution">
-                    <cite><a id="js-quote-link" class="button" href="{{ quote.quoteLink }}">
-                        <span id="js-quote-author" class="quote-author">— {{ quote.quoteAuthor }}</span>
-                    </a></cite>
+                    <cite>
+                        <a id="js-quote-link" class="button" href="{{ quote.quoteLink }}">
+                            <span id="js-quote-author" class="quote-author">— {{ quote.quoteAuthor }}</span>
+                        </a>
+                    </cite>
                 </footer>
             </blockquote>
 

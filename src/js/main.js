@@ -9,25 +9,7 @@ var App = (function () {
     var fontCache = [];
 
     // Font.
-    //var bodyStyles = document.documentElement.style;
     var bodyStyles = getComputedStyle(document.documentElement);
-    var font = bodyStyles.getPropertyValue('--font').trim();
-    console.log(font);
-
-    //var colorOne = bodyStyles.getPropertyValue('--colorone');
-    //var colorTwo = bodyStyles.getPropertyValue('--colortwo');
-
-
-    //console.log(bodyStyles);
-    //console.log(document.documentElement.style);
-
-    //var quoteStyles = getComputedStyle(document.getElementById('js-quote-text'));
-    //console.log(quoteStyles);
-    //console.log(quoteStyles.getPropertyValue('font-family'));
-    //console.log(bodyStyles);
-    //console.log(colorOne);
-    //console.log(colorTwo);
-    //console.log(font);
 
     // API URLs/info.
     var combos = 113592;
@@ -50,13 +32,28 @@ var App = (function () {
     var newQuote = document.getElementById('js-new-quote');
     var newColors = document.getElementById('js-new-colors');
 
+    var stylesheet;
+    var font;
+
+    /**
+     * Initializes page for our script.
+     *
+     * Buttons are assigned event listeners, and our default font is set.
+     */
     var init = function () {
+        stylesheet = document.styleSheets[2];
+        font = stylesheet.cssRules[0].style.fontFamily;
+
+        // TODO: set default colorOne and colorTwo here too, if needed.
+
         newFont.addEventListener('click', function (e) {
             e.preventDefault();
 
             // Send new request if cache is empty, or load from cache.
             if (fontCache.length === 0) {
                 console.log('1');
+
+                // Set request type, so out handler knows what function to call.
                 requestType = 'font';
                 _callOtherDomain(fontsUrl);
             } else if (fontCache.length > 0) {
@@ -85,16 +82,11 @@ var App = (function () {
     };
 
     /**
-     * foreach function for querySelectorAll elements.
-     */
-    var _forEach = function (array, callback, scope) {
-        for (var i = 0; i < array.length; i++) {
-            callback.call(scope, i, array[i]); // passes back stuff we need
-        }
-    };
-
-    /**
-     * Check if array contains a value.
+     * Check if a given value is contained in an array.
+     * @param arr Array to check.
+     * @param v Value to check for.
+     * @returns {boolean} True if found, false if not.
+     * @private
      */
     var _contains = function (arr, v) {
         for (var i = 0; i < arr.length; i++) {
@@ -104,7 +96,10 @@ var App = (function () {
     };
 
     /**
-     * Get all unique characters in a string.
+     * Get all uniqie characters in a given string.
+     * @param {string} str String to get unique characters from.
+     * @returns {Array}
+     * @private
      */
     var _unique = function (str) {
         var arr = [];
@@ -127,6 +122,11 @@ var App = (function () {
         return Math.floor(Math.random() * (max - min)) + min;
     };
 
+    /**
+     * Given a URL loads a JS script dynamically.
+     * @param {string} url URL to load via XMLHttpRequest.
+     * @private
+     */
     var _loadScript = function (url) {
         var wf = document.createElement('script'),
             s = document.scripts[0];
@@ -134,7 +134,12 @@ var App = (function () {
         s.parentNode.insertBefore(wf, s);
     };
 
-
+    /**
+     * Opens new XMLHttpRequest from a given URL, and calls
+     * _handler to deal with it.
+     * @param url URL from which to get new XMLHttpRequest.
+     * @private
+     */
     var _callOtherDomain = function (url) {
         if (invocation) {
             invocation.open('GET', url, true);
@@ -143,7 +148,12 @@ var App = (function () {
         }
     };
 
-
+    /**
+     * Depending on the value of requestType, gets a response and calls
+     * a specific function based on which request type was sent.
+     * @param evtXHR
+     * @private
+     */
     var _handler = function (evtXHR) {
         if (invocation.readyState === XMLHttpRequest.DONE) {
             if (invocation.status === 200) {
@@ -178,11 +188,19 @@ var App = (function () {
 
     };
 
+    /**
+     * Returns a string with each unique character.
+     * @returns {string}
+     * @private
+     */
     var _getUniqueChars = function () {
         return _unique(quoteText.innerHTML).join('');
     };
 
-
+    /**
+     * Generates a link back to the specific color/font/quote combo.
+     * @private
+     */
     var _generateQuoteLink = function () {
         // Get new colors wihtout # in front..
         colorOne = bodyStyles.getPropertyValue('--colorone');
@@ -190,6 +208,8 @@ var App = (function () {
 
         colorTwo = bodyStyles.getPropertyValue('--colortwo');
         colorTwo = colorTwo.slice(1);
+
+        // TODO: Get colors from cssstylesheet...
 
         var base = 'http://' + window.location.hostname + '/src/?';
         var colors = 'bg=' + colorOne + '&fg=' + colorTwo;
@@ -217,24 +237,32 @@ var App = (function () {
         _loadScript('https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js');
     };
 
-
+    /**
+     * Sets new quote, quthor, and link/
+     * @param {*} response JSON response from Forismatic.com
+     */
     var getNewQuote = function(response) {
-        // Set new quote, and characters needed for it.
+        // Set new quote, and load font characters needed for it.
         quoteText.innerHTML = response.quoteText;
         _loadFont(font);
-        console.log(font);
 
-        // Don't display blank author.
-        if (response.quoteAuthor.length > 0)
+        // Don't display blank author. Use 'Anonymous' if author is blank.
+        if (response.quoteAuthor.length > 0) {
             quoteAuthor.innerHTML = response.quoteAuthor;
-        else
+        } else {
             quoteAuthor.innerHTML = 'Anonymous';
+        }
 
+        // Update link to quote.
         quoteLink.setAttribute('href', response.quoteLink);
         _generateQuoteLink();
     };
 
-
+    /**
+     * Selects & updates CSS with new color combo.
+     *
+     * Updates link to quote.
+     */
     var getNewColors = function() {
         // Get random color pairing.
         var numColorPairs = colorCache.length;
@@ -242,22 +270,38 @@ var App = (function () {
         colorOne = pair.color_one;
         colorTwo = pair.color_two;
 
-        // Set new color CSS vars on root.
-        document.documentElement.style.setProperty('--colorone', colorOne, '');
-        document.documentElement.style.setProperty('--colortwo', colorTwo, '');
+        // Update CSS with new colors.
+        stylesheet.cssRules[1].style.color = colorOne; // color: color-one
+        stylesheet.cssRules[2].style.backgroundColor = colorOne; // color: color-one
+        stylesheet.cssRules[3].style.color = colorTwo; // color: color-one
+        stylesheet.cssRules[4].style.borderColor = colorTwo; // color: color-one
+        stylesheet.cssRules[5].style.backgroundColor = colorTwo; // color: color-one
 
         // Update color voting link. Remove # from colors.
         var voteButton = document.getElementById('js-colors-vote-link');
         voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne.slice(1) + '&compare=' + colorTwo.slice(1));
+
         _generateQuoteLink();
     };
 
 
+    /**
+     * Selects & updates CSS with random font family.
+     *
+     * Updates links to font & quote.
+     */
     var getNewFont = function() {
+        // Get random font from cached list, and load it.
         font = fontCache[_getRandomInt(0, fontCache.length)].family;
         _loadFont(font);
-        document.documentElement.style.setProperty('--font', font, '');
+
+        // Update CSS with new font.
+        stylesheet.cssRules[0].style.fontFamily = font;
+
+        // Update link to font source.
         fontLink.setAttribute('href', 'https://fonts.google.com/specimen/' + font);
+
+        // Get link back to this color/font/quote combination.
         _generateQuoteLink();
     };
 
