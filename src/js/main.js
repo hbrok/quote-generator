@@ -8,14 +8,11 @@ var App = (function () {
     var colorCache = [];
     var fontCache = [];
 
-    // Font.
-    var bodyStyles = getComputedStyle(document.documentElement);
-
     // API URLs/info.
     var combos = 113592;
-    var colorsURL = 'http://www.randoma11y.com/stats/';
+    //var colorsURL = 'http://www.randoma11y.com/stats/';
     var colorsPageURL = 'http://randoma11y.com/combos?';
-    var randoma11yUrl = 'http://www.randoma11y.com/stats/';
+    //var randoma11yUrl = 'http://www.randoma11y.com/stats/';
     var forismaticUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=App.getNewQuote';
     var fontsUrl = '/src/font-list.json';
 
@@ -34,6 +31,7 @@ var App = (function () {
 
     var stylesheet;
     var font;
+    var loadedFont = false;
 
     /**
      * Initializes page for our script.
@@ -42,48 +40,54 @@ var App = (function () {
      */
     var init = function () {
         stylesheet = document.styleSheets[2];
-        font = stylesheet.cssRules[0].style.fontFamily;
-        colorOne = stylesheet.cssRules[1].style.color;
-        colorTwo = stylesheet.cssRules[3].style.color;
+        //font = stylesheet.cssRules[0].style.fontFamily;
+        //font = font.replace('"', '').replace('"', '');
 
-        console.log(font);
-        console.log(colorOne);
-        console.log(colorTwo);
 
-        // TODO: set default colorOne and colorTwo here too, if needed.
+        font = document.body.getAttribute('data-font');
 
+        //console.log(stylesheet.cssRules[0]);
+        //colorOne = stylesheet.cssRules[1].style.color; // returns RGB which is no good to anyone
+        //colorTwo = stylesheet.cssRules[3].style.color;
+
+        colorOne = document.body.getAttribute('data-colorone');
+        colorTwo = document.body.getAttribute('data-colortwo');
+
+        //console.log(font);
+        //console.log(colorOne);
+        //console.log(colorTwo);
+        //
         newFont.addEventListener('click', function (e) {
             e.preventDefault();
 
-            // Send new request if cache is empty, or load from cache.
             if (fontCache.length === 0) {
-                console.log('1');
-
-                // Set request type, so out handler knows what function to call.
+                // Cache is empty, so set request type and send new request.
                 requestType = 'font';
                 _callOtherDomain(fontsUrl);
             } else if (fontCache.length > 0) {
-                console.log('2');
+                // Cache exists so get a new font.
                 getNewFont();
             }
         });
 
         newQuote.addEventListener('click', function (e) {
             e.preventDefault();
-            //_loadFont(font);
+
+            // jsonp request that calls getNewQuote() function.
             _loadScript(forismaticUrl);
         });
 
         newColors.addEventListener('click', function (e) {
             e.preventDefault();
 
-            // Send new request if cache is empty, or load from cache.
-            if (colorCache.length === 0) {
+            //if (colorCache.length === 0) {
+                // Cache is empty, set request type and get colors.
                 requestType = 'colors';
-                _callOtherDomain(colorsPageURL);
-            } else if (colorCache.length > 0) {
-                getNewColors();
-            }
+                //_callOtherDomain(colorsPageURL);
+                _callOtherDomain();
+            //} else if (colorCache.length > 0) {
+            //    getNewColors();
+            //}
         });
     };
 
@@ -107,15 +111,15 @@ var App = (function () {
      * @returns {Array}
      * @private
      */
-    var _unique = function (str) {
-        var arr = [];
-        for (var i = 0; i < str.length; i++) {
-            if (!_contains(arr, str[i])) {
-                arr.push(str[i]);
-            }
-        }
-        return arr;
-    };
+    //var _unique = function (str) {
+    //    var arr = [];
+    //    for (var i = 0; i < str.length; i++) {
+    //        if (!_contains(arr, str[i])) {
+    //            arr.push(str[i]);
+    //        }
+    //    }
+    //    return arr;
+    //};
 
     /**
      * Returns a random integer between min (included) and max (included)
@@ -148,9 +152,19 @@ var App = (function () {
      */
     var _callOtherDomain = function (url) {
         if (invocation) {
-            invocation.open('GET', url, true);
+            //invocation.open('GET', url, true);
+            //invocation.onreadystatechange = _handler;
+            //invocation.send();
+
+            invocation.open('POST', 'ajax-getdata.php', true);
+            var params = "function=" + requestType;
             invocation.onreadystatechange = _handler;
-            invocation.send();
+            invocation.setRequestHeader("Content-type",
+                "application/x-www-form-urlencoded");
+            //invocation.setRequestHeader("Content-length",
+            //    params.length);
+            //invocation.setRequestHeader("Connection", "close");
+            invocation.send( params );
         }
     };
 
@@ -163,13 +177,16 @@ var App = (function () {
     var _handler = function (evtXHR) {
         if (invocation.readyState === XMLHttpRequest.DONE) {
             if (invocation.status === 200) {
-                // Get response and replace escaped single quotes with
-                // unescaped single quotes. (Forismatic escapes single
-                // quotes in their JSON response, however that is not
-                // valid JSON).
+                /*
+                 * Get response and replace escaped single quotes with unescaped
+                 * single quotes. (Forismatic escapes single quotes in their JSON
+                 * response, however that is not valid JSON and it causes errors.)
+                 */
+                console.log(invocation);
+
                 var response = JSON.parse(invocation.responseText.replace("\\'", "'"));
 
-                // Different functions based on which button was pressed.
+                // Check which request was made based on requestType value.
                 switch (requestType) {
                     case 'font':
                         // Set font cache, and get new font.
@@ -195,35 +212,25 @@ var App = (function () {
     };
 
     /**
-     * Returns a string with each unique character.
-     * @returns {string}
-     * @private
-     */
-    var _getUniqueChars = function () {
-        return _unique(quoteText.innerHTML).join('');
-    };
-
-    /**
      * Generates a link back to the specific color/font/quote combo.
      * @private
      */
     var _generateQuoteLink = function () {
-        // Get new colors wihtout # in front..
-        //colorOne = bodyStyles.getPropertyValue('--colorone');
-        //colorOne = colorOne.slice(1);
-        //
-        //colorTwo = bodyStyles.getPropertyValue('--colortwo');
-        //colorTwo = colorTwo.slice(1);
-
-        // TODO: Get colors from cssstylesheet...
-
         var base = 'http://' + window.location.hostname + '/src/?';
-        var colors = 'bg=' + colorOne + '&fg=' + colorTwo;
-        //console.log(quoteLink);
-        var quote = '&quote=' + quoteText.innerHTML + '&author=' + quoteAuthor.innerHTML + '&id=' + quoteLink.getAttribute('href').slice(quoteLink.getAttribute('href').length - 11, quoteLink.getAttribute('href').length - 1);
-        var font = '&font=' + font;
+        var colors = 'bg=' + colorOne +
+                     '&fg=' + colorTwo;
+        var quote = '&quote=' + quoteText.innerHTML +
+                    '&author=' + quoteAuthor.innerHTML +
+                    '&id=' + quoteLink.getAttribute('href').slice(
+                        quoteLink.getAttribute('href').length - 11,
+                        quoteLink.getAttribute('href').length - 1
+                    );
+        //var font = '&font=' + font; // TODO: why isn't this loading the value from the variable?
+        var font = '&font=' + stylesheet.cssRules[0].style.fontFamily;
 
-        var link = encodeURI(base + colors + quote + font);
+        console.log(font);
+
+        var link = encodeURI(base + colors + quote + font.replace(' ', '+').replace('"', '').replace('"', '')); // TODO: this also sucks...
 
         quoteSource.setAttribute('href', link);
     };
@@ -231,14 +238,18 @@ var App = (function () {
 
     // TODO: Coda Caption, fonts with only bold styles aren giving an error when not being called with the correct font weight, so we need to also get the (first?) font weight available so they show up. OR only use the font if it has the normal 300/400 default weight....
 // Load a Google font by name.
-    var _loadFont = function (font) {
+    var _loadFont = function (font, fontVariant) {
+       // Explain here how I made the decision not to load only a subset of
+        // a font after page interaction. If someone wants to get 10 new quotes,
+        // they would load the same font data over and over again. Which doesn't make
+        // that much sense... better to load the whole font after the initial page load.
+
         console.log(font);
         WebFontConfig = {
             google: {
-                families: [font],
-                text: _getUniqueChars()
+                families: [font] // todo: get latin/font weight too.
             },
-            timeout: 2000 // Set the timeout to two seconds
+            timeout: 2000 // Set the timeout to two seconds.
         };
         _loadScript('https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js');
     };
@@ -248,19 +259,28 @@ var App = (function () {
      * @param {*} response JSON response from Forismatic.com
      */
     var getNewQuote = function(response) {
-        // Set new quote, and load font characters needed for it.
-        quoteText.innerHTML = response.quoteText;
-        _loadFont(font);
+        // Only load the whole new font once.
+        // TODO: Am I doing this in a good way?
+        if( ! loadedFont ) {
+            loadedFont = true;
+            _loadFont(font);
+        }
 
-        // Don't display blank author. Use 'Anonymous' if author is blank.
+        // Set new quote text and author.
+        quoteText.innerHTML = response.quoteText;
+
         if (response.quoteAuthor.length > 0) {
+            // Set author.
             quoteAuthor.innerHTML = response.quoteAuthor;
         } else {
+            // Set author if author is empty.
             quoteAuthor.innerHTML = 'Anonymous';
         }
 
         // Update link to quote.
         quoteLink.setAttribute('href', response.quoteLink);
+
+        // Get new link to this page.
         _generateQuoteLink();
     };
 
@@ -270,23 +290,31 @@ var App = (function () {
      * Updates link to quote.
      */
     var getNewColors = function() {
-        // Get random color pairing.
-        var numColorPairs = colorCache.length;
-        var pair = colorCache[_getRandomInt(0, numColorPairs)];
+        console.log(colorCache);
+        // Get random color pairing, with color values without the #.
+        var pair = colorCache[_getRandomInt(0, colorCache.length)];
+        var pair = colorCache[0];
         colorOne = pair.color_one;
         colorTwo = pair.color_two;
 
+        console.log(stylesheet);
+
         // Update CSS with new colors.
-        stylesheet.cssRules[1].style.color = colorOne; // color: color-one
+        stylesheet.cssRules[1].style.color           = colorOne; // color: color-one
         stylesheet.cssRules[2].style.backgroundColor = colorOne; // color: color-one
-        stylesheet.cssRules[3].style.color = colorTwo; // color: color-one
-        stylesheet.cssRules[4].style.borderColor = colorTwo; // color: color-one
+        stylesheet.cssRules[3].style.color           = colorTwo; // color: color-one
+        stylesheet.cssRules[4].style.borderColor     = colorTwo; // color: color-one
         stylesheet.cssRules[5].style.backgroundColor = colorTwo; // color: color-one
+
+        // Set variable without the #.
+        colorOne = colorOne.slice(1);
+        colorTwo = colorTwo.slice(1);
 
         // Update color voting link. Remove # from colors.
         var voteButton = document.getElementById('js-colors-vote-link');
-        voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne.slice(1) + '&compare=' + colorTwo.slice(1));
+        voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne + '&compare=' + colorTwo);
 
+        // Get new link to this page.
         _generateQuoteLink();
     };
 
@@ -297,9 +325,44 @@ var App = (function () {
      * Updates links to font & quote.
      */
     var getNewFont = function() {
+        //console.log(fontCache);
+
+        //for (var i = 0; i < fontCache.length; i++) {
+        //    var regular = false;
+        //
+        //    for (var j = 0; j < fontCache[i].variants.length; j++) {
+        //        if (fontCache[i].variants[j] === 'regular') {
+        //            regular = true;
+        //        }
+        //    }
+        //
+        //    if(!regular) {
+        //        console.log(fontCache[i].family);
+        //        console.log(fontCache[i].variants);
+        //    }
+        //}
+        var index = _getRandomInt(0, fontCache.length);
+        var fontVariant = 'regular';
+
+
         // Get random font from cached list, and load it.
-        font = fontCache[_getRandomInt(0, fontCache.length)].family;
-        _loadFont(font);
+        font = fontCache[index].family;
+        var regular = false;
+
+            for (var j = 0; j < fontCache[index].variants.length; j++) {
+                if (fontCache[index].variants[j] === 'regular') {
+                    regular = true;
+                }
+            }
+
+        if (!regular) {
+            fontVariant = fontCache[index].variants[0];
+        }
+
+
+        font = 'Buda';
+        // Load the entire new font.
+        _loadFont(font, fontVariant);
 
         // Update CSS with new font.
         stylesheet.cssRules[0].style.fontFamily = font;
@@ -307,7 +370,7 @@ var App = (function () {
         // Update link to font source.
         fontLink.setAttribute('href', 'https://fonts.google.com/specimen/' + font);
 
-        // Get link back to this color/font/quote combination.
+        // Get link back to this page.
         _generateQuoteLink();
     };
 
