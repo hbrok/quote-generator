@@ -9,12 +9,7 @@ var App = (function () {
     var fontCache = [];
 
     // API URLs/info.
-    var combos = 113592;
-    //var colorsURL = 'http://www.randoma11y.com/stats/';
-    var colorsPageURL = 'http://randoma11y.com/combos?';
-    //var randoma11yUrl = 'http://www.randoma11y.com/stats/';
     var forismaticUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=App.getNewQuote';
-    var fontsUrl = '/src/font-list.json';
 
     // Buttons.
     var quoteText = document.getElementById('js-quote-text');
@@ -40,30 +35,18 @@ var App = (function () {
      */
     var init = function () {
         stylesheet = document.styleSheets[2];
-        //font = stylesheet.cssRules[0].style.fontFamily;
-        //font = font.replace('"', '').replace('"', '');
-
-
         font = document.body.getAttribute('data-font');
-
-        //console.log(stylesheet.cssRules[0]);
-        //colorOne = stylesheet.cssRules[1].style.color; // returns RGB which is no good to anyone
-        //colorTwo = stylesheet.cssRules[3].style.color;
 
         colorOne = document.body.getAttribute('data-colorone');
         colorTwo = document.body.getAttribute('data-colortwo');
 
-        //console.log(font);
-        //console.log(colorOne);
-        //console.log(colorTwo);
-        //
         newFont.addEventListener('click', function (e) {
             e.preventDefault();
 
             if (fontCache.length === 0) {
                 // Cache is empty, so set request type and send new request.
                 requestType = 'font';
-                _callOtherDomain(fontsUrl);
+                _callOtherDomain();
             } else if (fontCache.length > 0) {
                 // Cache exists so get a new font.
                 getNewFont();
@@ -80,46 +63,10 @@ var App = (function () {
         newColors.addEventListener('click', function (e) {
             e.preventDefault();
 
-            //if (colorCache.length === 0) {
-                // Cache is empty, set request type and get colors.
-                requestType = 'colors';
-                //_callOtherDomain(colorsPageURL);
-                _callOtherDomain();
-            //} else if (colorCache.length > 0) {
-            //    getNewColors();
-            //}
+            requestType = 'colors';
+            _callOtherDomain();
         });
     };
-
-    /**
-     * Check if a given value is contained in an array.
-     * @param arr Array to check.
-     * @param v Value to check for.
-     * @returns {boolean} True if found, false if not.
-     * @private
-     */
-    var _contains = function (arr, v) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] === v) return true;
-        }
-        return false;
-    };
-
-    /**
-     * Get all uniqie characters in a given string.
-     * @param {string} str String to get unique characters from.
-     * @returns {Array}
-     * @private
-     */
-    //var _unique = function (str) {
-    //    var arr = [];
-    //    for (var i = 0; i < str.length; i++) {
-    //        if (!_contains(arr, str[i])) {
-    //            arr.push(str[i]);
-    //        }
-    //    }
-    //    return arr;
-    //};
 
     /**
      * Returns a random integer between min (included) and max (included)
@@ -152,19 +99,9 @@ var App = (function () {
      */
     var _callOtherDomain = function (url) {
         if (invocation) {
-            //invocation.open('GET', url, true);
-            //invocation.onreadystatechange = _handler;
-            //invocation.send();
-
-            invocation.open('POST', 'ajax-getdata.php', true);
-            var params = "function=" + requestType;
+            invocation.open('GET', 'ajax-getdata.php?function=' + requestType, true);
             invocation.onreadystatechange = _handler;
-            invocation.setRequestHeader("Content-type",
-                "application/x-www-form-urlencoded");
-            //invocation.setRequestHeader("Content-length",
-            //    params.length);
-            //invocation.setRequestHeader("Connection", "close");
-            invocation.send( params );
+            invocation.send(  );
         }
     };
 
@@ -182,8 +119,6 @@ var App = (function () {
                  * single quotes. (Forismatic escapes single quotes in their JSON
                  * response, however that is not valid JSON and it causes errors.)
                  */
-                console.log(invocation);
-
                 var response = JSON.parse(invocation.responseText.replace("\\'", "'"));
 
                 // Check which request was made based on requestType value.
@@ -196,7 +131,7 @@ var App = (function () {
 
                     case 'colors':
                         // Set color cache and get new colors.
-                        colorCache = response;
+                        colorCache = response[0];
                         getNewColors();
                         break;
 
@@ -205,7 +140,7 @@ var App = (function () {
                         break;
                 }
             } else {
-                alert('There was a problem with the request.');
+                console.log('There was a problem with the request.');
             }
         }
 
@@ -226,7 +161,7 @@ var App = (function () {
                         quoteLink.getAttribute('href').length - 1
                     );
         //var font = '&font=' + font; // TODO: why isn't this loading the value from the variable?
-        var font = '&font=' + stylesheet.cssRules[0].style.fontFamily;
+        var font = '&font=' + stylesheet.cssRules[0].style.fontFamily; // Get font family from stylesheet.
 
         console.log(font);
 
@@ -244,10 +179,9 @@ var App = (function () {
         // they would load the same font data over and over again. Which doesn't make
         // that much sense... better to load the whole font after the initial page load.
 
-        console.log(font);
         WebFontConfig = {
             google: {
-                families: [font] // todo: get latin/font weight too.
+                families: [font + ':' + fontVariant]
             },
             timeout: 2000 // Set the timeout to two seconds.
         };
@@ -259,8 +193,7 @@ var App = (function () {
      * @param {*} response JSON response from Forismatic.com
      */
     var getNewQuote = function(response) {
-        // Only load the whole new font once.
-        // TODO: Am I doing this in a good way?
+        // Check if the current font has already been loaded.
         if( ! loadedFont ) {
             loadedFont = true;
             _loadFont(font);
@@ -290,27 +223,22 @@ var App = (function () {
      * Updates link to quote.
      */
     var getNewColors = function() {
-        console.log(colorCache);
-        // Get random color pairing, with color values without the #.
-        var pair = colorCache[_getRandomInt(0, colorCache.length)];
-        var pair = colorCache[0];
-        colorOne = pair.color_one;
-        colorTwo = pair.color_two;
-
-        console.log(stylesheet);
+        // Get our colors.
+        colorOne = colorCache.color_one;
+        colorTwo = colorCache.color_two;
 
         // Update CSS with new colors.
         stylesheet.cssRules[1].style.color           = colorOne; // color: color-one
-        stylesheet.cssRules[2].style.backgroundColor = colorOne; // color: color-one
-        stylesheet.cssRules[3].style.color           = colorTwo; // color: color-one
-        stylesheet.cssRules[4].style.borderColor     = colorTwo; // color: color-one
-        stylesheet.cssRules[5].style.backgroundColor = colorTwo; // color: color-one
+        stylesheet.cssRules[2].style.backgroundColor = colorOne; // background-color: color-one
+        stylesheet.cssRules[3].style.color           = colorTwo; // color: color-two
+        stylesheet.cssRules[4].style.borderColor     = colorTwo; // border-color: color-two
+        stylesheet.cssRules[5].style.backgroundColor = colorTwo; // background-color: color-two
 
         // Set variable without the #.
         colorOne = colorOne.slice(1);
         colorTwo = colorTwo.slice(1);
 
-        // Update color voting link. Remove # from colors.
+        // Update color voting link without # from colors.
         var voteButton = document.getElementById('js-colors-vote-link');
         voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne + '&compare=' + colorTwo);
 
@@ -325,43 +253,26 @@ var App = (function () {
      * Updates links to font & quote.
      */
     var getNewFont = function() {
-        //console.log(fontCache);
-
-        //for (var i = 0; i < fontCache.length; i++) {
-        //    var regular = false;
-        //
-        //    for (var j = 0; j < fontCache[i].variants.length; j++) {
-        //        if (fontCache[i].variants[j] === 'regular') {
-        //            regular = true;
-        //        }
-        //    }
-        //
-        //    if(!regular) {
-        //        console.log(fontCache[i].family);
-        //        console.log(fontCache[i].variants);
-        //    }
-        //}
-        var index = _getRandomInt(0, fontCache.length);
-        var fontVariant = 'regular';
-
+        var index = _getRandomInt(0, fontCache.length); // Get random number for font.
+        var fontVariant = 'regular'; // Start with regular, since most fonts have the variant.
+        var regular = false;
 
         // Get random font from cached list, and load it.
         font = fontCache[index].family;
-        var regular = false;
 
-            for (var j = 0; j < fontCache[index].variants.length; j++) {
-                if (fontCache[index].variants[j] === 'regular') {
-                    regular = true;
-                }
+        // Search for 'regular' in the variants.
+        for (var i = 0; i < fontCache[index].variants.length; i++) {
+            if (fontCache[index].variants[i] === 'regular') {
+                regular = true;
             }
+        }
 
+        // Get the first variant if the font didn't have 'regular'.
         if (!regular) {
             fontVariant = fontCache[index].variants[0];
         }
 
-
-        font = 'Buda';
-        // Load the entire new font.
+        // Load new font.
         _loadFont(font, fontVariant);
 
         // Update CSS with new font.
