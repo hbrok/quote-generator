@@ -111,7 +111,124 @@
             .actions-bottom {
                 border-top: 3px solid;
             }
+
+
+            .ladda-button {
+                position: relative;
+                /*background: none;*/
+                /*border: 0;*/
+                /*padding: 0.8em 1em;*/
+                /*font-size: 1.3em;*/
+                cursor: pointer;
+                outline: 0;
+
+                -webkit-appearance: none;
+                -webkit-font-smoothing: antialiased;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+            .ladda-button[data-loading] {
+                cursor: default;
+            }
+
+            /*.ladda-button.orange {*/
+                /*background: #ea8557;*/
+                /*color: #fff;*/
+                /*border-radius: 2px;*/
+                /*border: 1px solid transparent;*/
+            /*}*/
+            /*.ladda-button.orange:hover {*/
+                /*border-color: rgba( 0, 0, 0, 0.07 );*/
+                /*background-color: #ffa96c;*/
+            /*}*/
+            /*.ladda-button.orange[data-loading] {*/
+                /*border-color: rgba( 0, 0, 0, 0.07 );*/
+                /*background-color: #999;*/
+            /*}*/
+
+
+            /* Spinner animation */
+           /* .ladda-button .spinner {
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                top: 50%;
+                margin-top: -16px;
+                opacity: 0;
+                background-image: url(img/loader.svg);
+            }*/
+            .ladda-button .spinner path {
+                fill: black;
+            }
+
+            .ladda-button,
+            .ladda-button .spinner,
+            .ladda-button .label {
+                /*-webkit-transition: 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275) all;*/
+                /*-moz-transition: 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275) all;*/
+                /*-ms-transition: 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275) all;*/
+                /*transition: 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275) all;*/
+            }
+
+            .ladda-button.zoom-in,
+            .ladda-button.zoom-in .spinner,
+            .ladda-button.zoom-in .label,
+            .ladda-button.zoom-out,
+            .ladda-button.zoom-out .spinner,
+            .ladda-button.zoom-out .label {
+                /*-webkit-transition: 0.3s ease all;*/
+                /*-moz-transition: 0.3s ease all;*/
+                /*-ms-transition: 0.3s ease all;*/
+                /*transition: 0.3s ease all;*/
+            }
+
+            .ladda-button.zoom-out {
+                overflow: hidden;
+            }
+            .ladda-button.zoom-out .spinner {
+                /*left: 50%;*/
+                /*margin-left: -16px;*/
+/**/
+                /*-webkit-transform: scale( 2.5 );*/
+                /*-moz-transform: scale( 2.5 );*/
+                /*-ms-transform: scale( 2.5 );*/
+                /*transform: scale( 2.5 );*/
+            }
+            .ladda-button.zoom-out .label {
+                position: relative;
+                display: inline-block;
+            }
+
+            .ladda-button.zoom-out[data-loading] .label {
+                /*opacity: 0;*/
+/**/
+                /*-webkit-transform: scale( 0.5 );*/
+                /*-moz-transform: scale( 0.5 );*/
+                /*-ms-transform: scale( 0.5 );*/
+                /*transform: scale( 0.5 );*/
+            }
+            .ladda-button.zoom-out[data-loading] .spinner {
+                opacity: 1;
+
+                -webkit-transform: none;
+                -moz-transform: none;
+                -ms-transform: none;
+                transform: none;
+            }
+
+            svg.svg {
+                /*width: 100;*/
+                display: block;
+                fill: #{{ color_two }};
+                margin: auto;
+                stop-color: #{{ color_two }};
+                position: absolute;
+                top: 24%;
+                left: 38%;
+            }
         </style>
+
+
 
         <!-- Starting Dynamic CSS. -->
         <style>
@@ -123,7 +240,8 @@
             .quote-link,
             ::selection,
             .button,
-            .button.hollow:hover {
+            .button.hollow:hover,
+            .button.hollow[data-loading] {
                 color: #{{ color_one }};
             }
 
@@ -153,8 +271,13 @@
             .quote-link,
             ::selection,
             .button,
-            .button.hollow:hover {
+            .button.hollow:hover,
+            .button.hollow[data-loading] {
                 background-color: #{{ color_two }};
+            }
+
+            .button.hollow[data-loading] {
+                opacity: .5;
             }
         </style>
     </head>
@@ -162,9 +285,18 @@
     <body data-colorone="{{ color_one }}" data-colortwo="{{ color_two }}" data-font="{{ font }}">
         <div class="actions actions-top">
             <!--<p>Generate quote with:</p>-->
-            <a id="js-new-font" class="button hollow" href="{{ quoteLink.font }}">New Font</a>
-            <a id="js-new-colors" class="button hollow" href="{{ quoteLink.colors }}">New Colors</a>
-            <a id="js-new-quote" class="button hollow" href="{{ quoteLink.quote }}">New Quote</a>
+            <a id="js-new-font" class="button hollow ladda-button orange zoom-out" data-loading href="{{ quoteLink.font }}"><span class="label">New Font</span>
+                <!--<svg class="svg" width="20" height="20" viewBox="0 0 38 38"><defs><linearGradient id="a" x1="8%" x2="65.7%" y1="0%" y2="23.9%"><stop class="stop"  stop-color="#fff" stop-opacity="0" offset="0%"/><stop class="stop" stop-color="#fff" stop-opacity=".6" offset="63.1%"/><stop class="stop" stop-color="#fff" offset="100%"/></linearGradient></defs><g fill="none" fill-rule="evenodd" transform="translate(1 1)"><path stroke="url(#a)" stroke-width="2" d="M36 18C36 8 28 0 18 0"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite"/></path><circle cx="36" cy="18" r="1" fill="#fff"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite"/></circle></g></svg>-->
+            </a>
+            <a id="js-new-colors" class="button hollow ladda-button orange zoom-out" href="{{ quoteLink.colors }}">
+                <span class="label">New Colors</span>
+                <!--<img src="img/loader.svg" class="spinner">-->
+            </a>
+
+            <a id="js-new-quote" class="button hollow ladda-button orange zoom-out" href="{{ quoteLink.quote }}">
+                <span class="label">New Quote</span>
+                <!--<img src="img/loader.svg" class="spinner">-->
+            </a>
         </div>
 
         <main class="main-content">
@@ -200,6 +332,39 @@
         <script src="js/main.js" async></script>
         <script>
             App.init();
+        </script>
+
+        <script>
+            var buttons = document.querySelectorAll( '.ladda-button' );
+
+            Array.prototype.slice.call( buttons ).forEach( function( button ) {
+
+                var resetTimeout;
+                var origText = button.innerHTML;
+                console.log(origText);
+
+                button.addEventListener( 'click', function() {
+
+//                    console.log(button);
+
+                    if( typeof button.getAttribute( 'data-loading' ) === 'string' ) {
+                        button.removeAttribute( 'data-loading' );
+                        button.innerHTML = origText;
+                    }
+                    else {
+                        button.setAttribute( 'data-loading', '' );
+                        button.innerHTML = 'Loading...';
+                    }
+
+                    clearTimeout( resetTimeout );
+                    resetTimeout = setTimeout( function() {
+                        button.removeAttribute( 'data-loading' );
+                        button.innerHTML = origText;
+                    }, 2000 );
+
+                }, false );
+
+            } );
         </script>
     </body>
 </html>
