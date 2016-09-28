@@ -42,6 +42,7 @@ var App = (function () {
 
         newFont.addEventListener('click', function (e) {
             e.preventDefault();
+            newFont.setAttribute( 'data-loading', '' );
 
             if (fontCache.length === 0) {
                 // Cache is empty, so set request type and send new request.
@@ -55,6 +56,7 @@ var App = (function () {
 
         newQuote.addEventListener('click', function (e) {
             e.preventDefault();
+            newQuote.setAttribute( 'data-loading', '' );
 
             // jsonp request that calls getNewQuote() function.
             _loadScript(forismaticUrl);
@@ -62,6 +64,7 @@ var App = (function () {
 
         newColors.addEventListener('click', function (e) {
             e.preventDefault();
+            newColors.setAttribute( 'data-loading', '' );
 
             requestType = 'colors';
             _callOtherDomain();
@@ -215,6 +218,7 @@ var App = (function () {
 
         // Get new link to this page.
         _generateQuoteLink();
+        newQuote.removeAttribute('data-loading');
     };
 
     /**
@@ -244,6 +248,7 @@ var App = (function () {
 
         // Get new link to this page.
         _generateQuoteLink();
+        newColors.removeAttribute('data-loading');
     };
 
 
@@ -283,6 +288,7 @@ var App = (function () {
 
         // Get link back to this page.
         _generateQuoteLink();
+        newFont.removeAttribute('data-loading');
     };
 
     return {
