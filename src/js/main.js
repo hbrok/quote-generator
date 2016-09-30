@@ -23,9 +23,13 @@ var App = (function () {
     var newFont = document.getElementById('js-new-font');
     var newQuote = document.getElementById('js-new-quote');
     var newColors = document.getElementById('js-new-colors');
+    var colorOneHex = document.getElementById('js-color-one');
+    var colorTwoHex = document.getElementById('js-color-two');
 
     var stylesheet;
     var font;
+    var colorOne;
+    var colorTwo;
     var loadedFont = false;
 
     /**
@@ -58,7 +62,7 @@ var App = (function () {
             e.preventDefault();
             newQuote.setAttribute( 'data-loading', '' );
 
-            // jsonp request that calls getNewQuote() function.
+            // jsonp request, calls getNewQuote() function.
             _loadScript(forismaticUrl);
         });
 
@@ -72,8 +76,7 @@ var App = (function () {
     };
 
     /**
-     * Returns a random integer between min (included) and max (included)
-     * Using Math.round() will give you a non-uniform distribution!
+     * Returns a random integer between min (included) and max (included).
      * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#Examples
      */
     var _getRandomInt = function (min, max) {
@@ -97,34 +100,32 @@ var App = (function () {
     /**
      * Opens new XMLHttpRequest from a given URL, and calls
      * _handler to deal with it.
-     * @param url URL from which to get new XMLHttpRequest.
      * @private
      */
-    var _callOtherDomain = function (url) {
+    var _callOtherDomain = function () {
         if (invocation) {
             invocation.open('GET', 'ajax-getdata.php?function=' + requestType, true);
             invocation.onreadystatechange = _handler;
-            invocation.send(  );
+            invocation.send();
         }
     };
 
     /**
      * Depending on the value of requestType, gets a response and calls
      * a specific function based on which request type was sent.
-     * @param evtXHR
      * @private
      */
-    var _handler = function (evtXHR) {
+    var _handler = function () {
         if (invocation.readyState === XMLHttpRequest.DONE) {
             if (invocation.status === 200) {
                 /*
-                 * Get response and replace escaped single quotes with unescaped
-                 * single quotes. (Forismatic escapes single quotes in their JSON
-                 * response, however that is not valid JSON and it causes errors.)
+                 * Replace escaped single quotes with unescaped single quotes.
+                 * (Forismatic escapes single quotes in their JSON response,
+                 * however that is not valid JSON and causes errors.)
                  */
                 var response = JSON.parse(invocation.responseText.replace("\\'", "'"));
 
-                // Check which request was made based on requestType value.
+                // Check type and request.
                 switch (requestType) {
                     case 'font':
                         // Set font cache, and get new font.
@@ -143,10 +144,10 @@ var App = (function () {
                         break;
                 }
             } else {
+                // TODO: Print error to screen??
                 console.log('There was a problem with the request.');
             }
         }
-
     };
 
     /**
@@ -155,33 +156,28 @@ var App = (function () {
      */
     var _generateQuoteLink = function () {
         var base = 'http://' + window.location.hostname + '/src/?';
-        var colors = 'bg=' + colorOne +
-                     '&fg=' + colorTwo;
+        var colors = 'c1=' + colorOne +
+                     '&c2=' + colorTwo;
         var quote = '&quote=' + quoteText.innerHTML +
                     '&author=' + quoteAuthor.innerHTML +
                     '&id=' + quoteLink.getAttribute('href').slice(
                         quoteLink.getAttribute('href').length - 11,
                         quoteLink.getAttribute('href').length - 1
                     );
-        //var font = '&font=' + font; // TODO: why isn't this loading the value from the variable?
-        var font = '&font=' + stylesheet.cssRules[0].style.fontFamily; // Get font family from stylesheet.
-
-        console.log(font);
-
-        var link = encodeURI(base + colors + quote + font.replace(' ', '+').replace('"', '').replace('"', '')); // TODO: this also sucks...
+        var fontPart = '&font=' + font;
+        var link = encodeURI(base + colors + quote + fontPart);
 
         quoteSource.setAttribute('href', link);
     };
 
-
-    // TODO: Coda Caption, fonts with only bold styles aren giving an error when not being called with the correct font weight, so we need to also get the (first?) font weight available so they show up. OR only use the font if it has the normal 300/400 default weight....
-// Load a Google font by name.
+    /**
+     * Load a font.
+     *
+     * @param font Font name.
+     * @param fontVariant Font variant (must be specified because some fonts don't have a 'regular' variant).
+     * @private
+     */
     var _loadFont = function (font, fontVariant) {
-       // Explain here how I made the decision not to load only a subset of
-        // a font after page interaction. If someone wants to get 10 new quotes,
-        // they would load the same font data over and over again. Which doesn't make
-        // that much sense... better to load the whole font after the initial page load.
-
         WebFontConfig = {
             google: {
                 families: [font + ':' + fontVariant]
@@ -231,6 +227,9 @@ var App = (function () {
         colorOne = colorCache.color_one;
         colorTwo = colorCache.color_two;
 
+        colorOneHex.innerHTML = colorOne;
+        colorTwoHex.innerHTML = colorTwo;
+
         // Update CSS with new colors.
         stylesheet.cssRules[1].style.color           = colorOne; // color: color-one
         stylesheet.cssRules[2].style.backgroundColor = colorOne; // background-color: color-one
@@ -264,6 +263,7 @@ var App = (function () {
 
         // Get random font from cached list, and load it.
         font = fontCache[index].family;
+        console.log(font);
 
         // Search for 'regular' in the variants.
         for (var i = 0; i < fontCache[index].variants.length; i++) {
@@ -283,8 +283,9 @@ var App = (function () {
         // Update CSS with new font.
         stylesheet.cssRules[0].style.fontFamily = font;
 
-        // Update link to font source.
+        // Update font link & font name.
         fontLink.setAttribute('href', 'https://fonts.google.com/specimen/' + font);
+        fontLink.innerHTML = font;
 
         // Get link back to this page.
         _generateQuoteLink();

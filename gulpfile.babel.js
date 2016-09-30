@@ -6,6 +6,7 @@ import gulp from 'gulp';
 // Load all gulp plugins automatically
 // and attach them to the `plugins` object
 import plugins from 'gulp-load-plugins';
+import uglify from 'gulp-uglify';
 
 // Temporary solution until gulp 4
 // https://github.com/gulpjs/gulp/issues/355
@@ -75,6 +76,7 @@ gulp.task('copy', [
     'copy:.htaccess',
     'copy:license',
     'copy:main.css',
+    'copy:main.js',
     'copy:misc'
 ]);
 
@@ -103,6 +105,15 @@ gulp.task('copy:main.css', () => {
         .pipe(gulp.dest(`${dirs.dist}/css`));
 });
 
+gulp.task('copy:main.js', () => {
+
+    gulp.src(`${dirs.src}/js/main.js`)
+        .pipe( uglify()
+            .on('error', e => { console.log(e); })
+        )
+        .pipe(gulp.dest(`${dirs.dist}/js`));
+});
+
 gulp.task('copy:misc', () =>
     gulp.src([
 
@@ -112,6 +123,7 @@ gulp.task('copy:misc', () =>
         // Exclude the following files
         // (other tasks will handle the copying of these files)
         `!${dirs.src}/css/main.css`,
+        `!${dirs.src}/js/main.js`,
         `!${dirs.src}/index.html`
 
     ], {

@@ -22,7 +22,7 @@ if ( isset( $_GET['function'] ) ) {
 		case 'colors':
 			$url         = 'http://www.randoma11y.com/stats/';
 			$a11y_stats  = $quotes->getJson( $url );
-			$count       = $a11y_stats['combos'];
+			$count       = $a11y_stats->combos;
 			$color_index = rand( 1, $count );
 
 			$url2 = 'http://randoma11y.com/combos?page=' . $color_index . '&per_page=1';

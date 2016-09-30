@@ -4,69 +4,47 @@ class WebSite {
 	public $font;
 	public $color_one;
 	public $color_two;
-
 	public $quote;
-
 	public $quoteLink;
+	public $shortQuoteLink;
 
 	public function __construct() {
-		// TODO: Move $_GET stuff to function.
-		// Rename function to getQuote... it's not always getting a random quote.
+		/*
+		 * Check quote params.
+		 */
 		if ( isset( $_GET['quote'] ) && isset( $_GET['author'] ) && isset( $_GET['id'] ) ) {
-			$this->quote = $this->random_quote( $_GET['quote'], $_GET['author'], $_GET['id'] );
+			$this->quote = $this->get_new_quote( $_GET['quote'], $_GET['author'], $_GET['id'] );
 		} else {
-			$this->quote = $this->random_quote();
+			$this->quote = $this->get_new_quote();
 		}
 
-		// Set font from GET variable, or get a random font.
-//		$this->set_font();
+		/*
+		 * Check if font is set, or if we must get a new one.
+		 */
 		if ( isset( $_GET['font'] ) ) {
-			$this->set_font( $_GET['font'] );
+			$this->get_new_font( $_GET['font'] );
 		} else {
-			$this->set_font();
+			$this->get_new_font();
 		}
 
-		// TODO: Move $_GET stuff to the function.
-		// Rename function??
-		if ( isset( $_GET['bg'] ) && isset( $_GET['fg'] ) ) {
-			$this->set_css( $_GET['fg'], $_GET['bg'] );
+		/*
+		 * Check if colors are set.
+		 */
+		if ( isset( $_GET['c1'] ) && isset( $_GET['c2'] ) ) {
+			$this->get_new_colors( $_GET['c1'], $_GET['c2'] );
 		} else {
-			$this->set_css();
+			$this->get_new_colors();
 		}
 
 		$this->get_quote_link();
 	}
 
 	/**
-	 * Get HEX codes without #.
-	 *
-	 * @param string $type Which color to get: 'bg' or 'color'.
-	 */
-	public function get_hex( $type ) {
-		if ( $type === 'bg' ) {
-			echo str_replace( '#', '', $this->color_one );
-		} elseif ( $type === 'color' ) {
-			echo str_replace( '#', '', $this->color_two );
-		}
-	}
-
-	/**
-	 * Get quote author.
-	 */
-	public function get_author() {
-		if ( isset( $this->quote->quoteAuthor ) ) {
-			echo $this->quote->quoteAuthor;
-		} else {
-			echo 'Anonymous';
-		}
-	}
-
-	/**
 	 * Get a link back to the same quote with colors/font/quote set.
 	 */
 	public function get_quote_link() {
-		$base   = 'http://' . $_SERVER['SERVER_NAME'] . '/src/';
-		$colors = 'bg=' . $this->color_one . '&fg=' . $this->color_two;
+		$base   = 'http://' . $_SERVER['SERVER_NAME'] . '/';
+		$colors = 'c1=' . $this->color_one . '&c2=' . $this->color_two;
 		$quote  = 'quote=' . urlencode( $this->quote->quoteText ) . '&author=' . urlencode( $this->quote->quoteAuthor );
 		$font   = 'font=' . urlencode( $this->font );
 
@@ -77,6 +55,39 @@ class WebSite {
 		$this->quoteLink['font']   = $base . '?' . $colors . '&' . $quote;
 		$this->quoteLink['quote']  = $base . '?' . $font . '&' . $colors . '&' . $id;
 		$this->quoteLink['all']    = $base . '?' . $font . '&' . $colors . '&' . $quote . '&' . $id;
+
+		$url = $this->quoteLink['all'];
+		$this->shortQuoteLink = $this->shorten_url($url);
+	}
+
+	/**
+	 *
+	 * @link https://github.com/tommcfarlin/gURLDemo
+	 * @param $url
+	 * @return mixed
+	 */
+	protected function shorten_url( $url ) {
+		$google_url = 'https://www.googleapis.com/urlshortener/v1/url';
+		$key = 'AIzaSyD02NoBU2DFMfsCIXMq_Rrt9SvO7a-6xNg';
+
+		$ch = curl_init($google_url . '?key=' . $key);
+
+		curl_setopt_array(
+			$ch,
+			array(
+				CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_TIMEOUT => 5,
+				CURLOPT_CONNECTTIMEOUT => 0,
+				CURLOPT_POST => 1,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_POSTFIELDS => '{"longUrl": "' . $url . '"}'
+			)
+		);
+
+		$json_response = json_decode(curl_exec($ch), true);
+		return $json_response['id'] ? $json_response['id'] : $url;
 	}
 
 	/**
@@ -100,18 +111,23 @@ class WebSite {
 	 *
 	 * @return array|mixed|stdClass
 	 */
-	protected function random_quote( $quoteText = false, $quoteAuthor = false, $quoteLink = false ) {
+	protected function get_new_quote( $quoteText = false, $quoteAuthor = false, $quoteLink = false ) {
 		if ( $quoteText && $quoteAuthor && $quoteLink ) {
 			$quote              = new stdClass();
 			$quote->quoteText   = urldecode( $quoteText );
 			$quote->quoteAuthor = urldecode( $quoteAuthor );
-			$quote->quoteLink   = urldecode( $quoteLink );
+			$quote->quoteLink   = 'http://forismatic.com/en/' . urldecode( $quoteLink );
 			$this->quote        = $quote;
 			return $this->quote;
 		} else {
-			// FIXME: Sometimes a NULL result is returned, figure out how to stop this.
 			$quote       = $this->fetch_quote();
 			$this->quote = $quote;
+
+			// Sometimes the quote is empty, if the quote is empty, try again.
+			if ( $this->quote === null || $this->quote->quoteAuthor === null || $this->quote->quoteText === null ) {
+				$this->get_new_quote();
+			}
+
 			return $this->quote;
 		}
 	}
@@ -128,21 +144,21 @@ class WebSite {
 
 	/**
 	 * Get a list of all available Google fonts.
-	 * @param bool $new_font
+	 * @param string|bool $new_font Name of font to load.
 	 *
 	 * @return bool
 	 */
-	protected function set_font( $new_font = false ) {
+	protected function get_new_font( $new_font = false ) {
+		// Get list of available fonts.
 		$url = 'https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyD02NoBU2DFMfsCIXMq_Rrt9SvO7a-6xNg';
 		$fonts = $this->getJson( $url );
+		$fonts_list = $fonts->items;
 
-		$fonts_list = $fonts['items'];
-
-		// Check if $new_font is an existing font, and set it as the global font if so.
+		// If $new_font is set
 		if ( $new_font ) {
 			foreach ( $fonts_list as $font ) {
-				if ( $font['family'] === $new_font ) {
-					$this->font = $font['family'];
+				if ( $font->family === $new_font ) {
+					$this->font = $font->family;
 
 					return $this->font;
 				}
@@ -151,26 +167,27 @@ class WebSite {
 
 		// Get random font.
 		$rand       = rand( 0, count( $fonts_list ) );
-		$this->font = $fonts_list[ $rand ]['family'];
+		$this->font = $fonts_list[ $rand ]->family;
 
 		return $this->font;
 	}
 
 	/**
+	 * Fetch colors to use.
 	 *
-	 * @param bool|string $foreground Color one.
-	 * @param bool|string $background Color two.
+	 * @param bool|string $color_one Color two.
+	 * @param bool|string $color_two Color one.
 	 */
-	protected function set_css( $foreground = false, $background = false ) {
-		if ( $foreground && $background ) {
+	protected function get_new_colors( $color_one = false, $color_two = false  ) {
+		if ( $color_two && $color_one ) {
 			// Get specific colors.
-			$this->color_one = $background;
-			$this->color_two = $foreground;
+			$this->color_one = $color_one;
+			$this->color_two = $color_two;
 		} else {
 			// Get random colors.
 			$url        = 'http://www.randoma11y.com/stats/';
 			$a11y_stats = $this->getJson( $url );
-			$count      = $a11y_stats['combos'];
+			$count      = $a11y_stats->combos;
 			$color_index = rand( 1, $count );
 
 			$url        = 'http://randoma11y.com/combos?page=' . $color_index . '&per_page=1';
@@ -178,10 +195,8 @@ class WebSite {
 
 			$first = $a11y_color[0];
 
-			$this->color_id = $first['id'];
-
-			$this->color_one = str_replace( '#', '', $first['color_one'] );
-			$this->color_two = str_replace( '#', '', $first['color_two'] );
+			$this->color_one = str_replace( '#', '', $first->color_one );
+			$this->color_two = str_replace( '#', '', $first->color_two );
 		}
 	}
 
@@ -199,28 +214,25 @@ class WebSite {
 	 */
 	public function getJson( $url, $cache = true ) {
 		date_default_timezone_set('America/Chicago');
-		// cache files are created like cache/abcdef123456...
+
+		// Cache files are stored in /data.
 		$cacheFile = getcwd() . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . md5( $url );
 
 		// Check if file exists.
 		if ( $cache && file_exists( $cacheFile ) ) {
-//			echo 'File exists.';
-			$fh        = fopen( $cacheFile, 'r' );
+			$fh = fopen( $cacheFile, 'r' );
 
-			// if data was cached recently, return cached data
+			// If file has been updated within the last hour, return cached version.
 			if ( filemtime( $cacheFile ) > strtotime( '-60 minutes' ) ) {
-				return json_decode( fread( $fh, filesize($cacheFile) ), true );
+				return json_decode( fread( $fh, filesize($cacheFile) ), false );
 			}
 
-			// else delete cache file
+			// Else, delete the file and get new data.
 			fclose( $fh );
 			unlink( $cacheFile );
 		}
 
-//		echo 'Get new data.';
-
-
-		// If no cached file, or cached file was too old, get data as normal.
+		// Get new data from url.
 		$options = array(
 			'ssl' => array(
 				'verify_peer'      => false,
@@ -231,13 +243,12 @@ class WebSite {
 		$json = file_get_contents( $url, false, stream_context_create( $options ) );
 
 		if ( $cache ) {
-			// Save new data.
+			// Save new data to file.
 			$fh = fopen( $cacheFile, 'w' );
 			fwrite( $fh, $json );
 			fclose( $fh );
 		}
 
-
-		return json_decode( $json, true );
+		return json_decode( $json, false );
 	}
 }

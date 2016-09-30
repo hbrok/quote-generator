@@ -6,25 +6,30 @@ html {
 body {
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
     border-top: 10px solid;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     transition: background-color .3s;
+}
+
+a {
+    border-bottom: 1px solid;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 ::selection {
     text-shadow: none;
 }
 
-.button {
+.button,
+#js-quote-source {
     padding: .5rem;
     display: inline-block;
     border: 2px solid;
     text-decoration: none;
     text-transform: uppercase;
     transition: all .2s;
+    font-weight: normal;
 }
 
 .button:hover,
@@ -37,31 +42,32 @@ body {
     opacity: .5;
 }
 
-.main-content {
-    flex: 1;
-}
-
-.footer {
-    margin-top: 3rem;
-    background-color: rgba(0, 0, 0, 0.05);
-    padding: 2rem 1rem;
+.actions {
+    padding: 0 0 1.5rem 0;
     text-align: center;
-    color: #efefef;
 }
 
-.quote, #quote {
+.actions .button {
+    margin-bottom: .5rem;
+}
+
+.actions h1 {
+    font-size: 1.75rem;
+}
+
+#quote {
     width: 85%;
     margin: 0 auto 5rem auto;
 }
 
 @media (min-width: 650px) {
-    .quote, #quote {
+    #quote {
         width: 75%;
     }
 }
 
 @media (min-width: 1000px) {
-    .quote, #quote {
+    #quote {
         width: 60%;
     }
 }
@@ -104,32 +110,33 @@ body {
     }
 }
 
-.quote-link {
-    color: #fefefe;
-    padding: .5rem .5rem;
-    background-color: rgba(0, 0, 0, 0.3);
-    transition: all .5s;
-    text-decoration: none;
-    text-transform: none;
+#js-quote-source {
+    text-transform: lowercase;
 }
 
-.actions {
-    width: 95%;
-    margin: 0 auto;
+.vote-actions {
+    border-top: 3px solid;
+}
+
+.link-actions {
+    padding: 2rem 1rem;
+    background-color: rgba(0, 0, 0, 0.05);
     text-align: center;
 }
 
-
-
-.actions p {
-    margin-top: 3rem;
-    font-weight: bold;
+.vote-actions,
+.link-actions {
+    margin: 0 auto;
+    padding: 2rem 15%;
+    text-align: center;
 }
 
-.actions-top {
-    padding: 1.5rem 0;
-}
-
-.actions-bottom {
-    border-top: 3px solid;
+.footer {
+    text-align: center;
+    color: #efefef;
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: .85rem;
+    padding: .75rem;
+    border-bottom: 15px solid;
+    opacity: 1.5;
 }
