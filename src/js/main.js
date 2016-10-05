@@ -7,9 +7,7 @@ var App = (function () {
     // Caches.
     var colorCache = [];
     var fontCache = [];
-
-    // API URLs/info.
-    var forismaticUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=jsonp&jsonp=App.getNewQuote';
+    var quoteResponse = [];
 
     // Buttons.
     var quoteText = document.getElementById('js-quote-text');
@@ -62,8 +60,8 @@ var App = (function () {
             e.preventDefault();
             newQuote.setAttribute( 'data-loading', '' );
 
-            // jsonp request, calls getNewQuote() function.
-            _loadScript(forismaticUrl);
+            requestType = 'quote';
+            _callOtherDomain();
         });
 
         newColors.addEventListener('click', function (e) {
@@ -139,6 +137,13 @@ var App = (function () {
                         getNewColors();
                         break;
 
+                    case 'quote':
+                        // Set quote as response.
+                        quoteResponse = response;
+                        getNewQuote();
+                        break;
+
+
                     default:
                         alert('No request type set.');
                         break;
@@ -189,9 +194,8 @@ var App = (function () {
 
     /**
      * Sets new quote, quthor, and link/
-     * @param {*} response JSON response from Forismatic.com
      */
-    var getNewQuote = function(response) {
+    var getNewQuote = function() {
         // Check if the current font has already been loaded.
         if( ! loadedFont ) {
             loadedFont = true;
@@ -199,18 +203,18 @@ var App = (function () {
         }
 
         // Set new quote text and author.
-        quoteText.innerHTML = response.quoteText;
+        quoteText.innerHTML = quoteResponse.quoteText;
 
-        if (response.quoteAuthor.length > 0) {
+        if (quoteResponse.quoteAuthor.length > 0) {
             // Set author.
-            quoteAuthor.innerHTML = response.quoteAuthor;
+            quoteAuthor.innerHTML = quoteResponse.quoteAuthor;
         } else {
             // Set author if author is empty.
             quoteAuthor.innerHTML = 'Anonymous';
         }
 
         // Update link to quote.
-        quoteLink.setAttribute('href', response.quoteLink);
+        quoteLink.setAttribute('href', quoteResponse.quoteLink);
 
         // Get new link to this page.
         _generateQuoteLink();

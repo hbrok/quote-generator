@@ -15,7 +15,8 @@ if ( isset( $_GET['function'] ) ) {
 			break;
 
 		case 'quote':
-			echo json_encode( $quotes->fetch_quote() );
+			$url = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
+			echo json_encode( $quotes->getJson( $url, false ) );
 			exit();
 			break;
 
