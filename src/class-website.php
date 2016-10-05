@@ -54,9 +54,10 @@ class WebSite {
 		$this->quoteLink['colors'] = $base . '?' . $font . '&' . $quote;
 		$this->quoteLink['font']   = $base . '?' . $colors . '&' . $quote;
 		$this->quoteLink['quote']  = $base . '?' . $font . '&' . $colors . '&' . $id;
-		$this->quoteLink['all']    = $base . '?' . $font . '&' . $colors . '&' . $quote . '&' . $id;
+		$this->quoteLink['all']    = $base . '?' . $quote . '&' . $font . '&' . $colors . '&' . $id;
 
 		$url = $this->quoteLink['all'];
+
 		$this->shortQuoteLink = $this->shorten_url($url);
 	}
 
