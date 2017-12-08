@@ -1,6 +1,6 @@
 <?php
     require(__DIR__ . '/../vendor/autoload.php');
-    require_once(dirname(dirname(dirname(dirname(__DIR__)))). '/class-website.php');
+    require(__DIR__ . '/class-website.php');
 
     $quotes = new WebSite;
 
