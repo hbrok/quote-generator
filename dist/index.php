@@ -4,8 +4,6 @@
     require('../vendor/autoload.php');
     require($_SERVER['DOCUMENT_ROOT'] . '/class-website.php');
 
-    var_dump($_SERVER['DOCUMENT_ROOT'] . '/class-website.php');
-
     $quotes = new WebSite;
 
     $mustache = new Mustache_Engine( array(
