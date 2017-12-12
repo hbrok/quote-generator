@@ -43,7 +43,7 @@ class WebSite {
 	 * Get a link back to the same quote with colors/font/quote set.
 	 */
 	public function get_quote_link() {
-		$base   = 'http://' . $_SERVER['SERVER_NAME'] . '/';
+		$base   = 'http://' . $_SERVER['HTTP_HOST'] . '/';
 		$colors = 'c1=' . $this->color_one . '&c2=' . $this->color_two;
 		$quote  = 'quote=' . urlencode( $this->quote->quoteText ) . '&author=' . urlencode( $this->quote->quoteAuthor );
 		$font   = 'font=' . urlencode( $this->font );
