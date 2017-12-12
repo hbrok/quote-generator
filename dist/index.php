@@ -1,6 +1,10 @@
 <?php
+    $path = $_SERVER['DOCUMENT_ROOT'];
+
     require('../vendor/autoload.php');
-    require('./class-website.php');
+    require($_SERVER['DOCUMENT_ROOT'] . '/class-website.php');
+
+    var_dump($_SERVER['DOCUMENT_ROOT'] . '/class-website.php');
 
     $quotes = new WebSite;
 
