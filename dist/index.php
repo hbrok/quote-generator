@@ -1,6 +1,6 @@
 <?php
     require('../vendor/autoload.php');
-    require('class-website.php');
+    require('../class-website.php');
 
     var_dump(__DIR__);
 
