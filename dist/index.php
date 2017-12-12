@@ -2,7 +2,7 @@
     require('../vendor/autoload.php');
     require('../class-website.php');
 
-    var_dump(__DIR__);
+    var_dump(__DIR__ . '../class-website.php');
 
     $quotes = new WebSite;
 
