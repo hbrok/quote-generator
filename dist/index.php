@@ -1,6 +1,6 @@
 <?php
     require('../vendor/autoload.php');
-    require('/class-website.php');
+    require('./class-website.php');
 
     $quotes = new WebSite;
 
