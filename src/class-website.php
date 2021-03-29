@@ -1,5 +1,8 @@
 <?php
 
+use Colors\RandomColor;
+use ColorContrast\ColorContrast;
+
 class WebSite {
 	public $font;
 	public $color_one;
@@ -185,19 +188,17 @@ class WebSite {
 			$this->color_one = $color_one;
 			$this->color_two = $color_two;
 		} else {
+			$contrast = new ColorContrast();
+			$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
+
+			while ( ! $combinations ) {
+				$contrast->addColors( RandomColor::one(), RandomColor::one() );
+				$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
+			}
+
 			// Get random colors.
-			$url        = 'http://www.randoma11y.com/stats/';
-			$a11y_stats = $this->getJson( $url );
-			$count      = $a11y_stats->combos;
-			$color_index = rand( 1, $count );
-
-			$url        = 'http://randoma11y.com/combos?page=' . $color_index . '&per_page=1';
-			$a11y_color = $this->getJson( $url, false );
-
-			$first = $a11y_color[0];
-
-			$this->color_one = str_replace( '#', '', $first->color_one );
-			$this->color_two = str_replace( '#', '', $first->color_two );
+			$this->color_one = str_replace( '#', '', $combinations[0]->getForeground() );
+			$this->color_two = str_replace( '#', '', $combinations[0]->getBackground() );
 		}
 	}
 

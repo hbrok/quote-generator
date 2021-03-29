@@ -1,5 +1,7 @@
 {
     "require": {
-        "mustache/mustache": "~2.5"
+        "mustache/mustache": "~2.5",
+        "mistic100/randomcolor": "^1.0",
+        "davidgorges/color-contrast": "^1.0"
     }
 }

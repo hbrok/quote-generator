@@ -245,10 +245,6 @@ var App = (function () {
         colorOne = colorOne.slice(1);
         colorTwo = colorTwo.slice(1);
 
-        // Update color voting link without # from colors.
-        var voteButton = document.getElementById('js-colors-vote-link');
-        voteButton.setAttribute('href', 'http://randoma11y.com/#/?hex=' + colorOne + '&compare=' + colorTwo);
-
         // Get new link to this page.
         _generateQuoteLink();
         newColors.removeAttribute('data-loading');

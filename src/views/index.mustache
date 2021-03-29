@@ -41,7 +41,7 @@
             }
 
             body,
-            .vote-actions,
+            .link-actions,
             .footer,
             .button:hover,
             .button.hollow,
@@ -87,13 +87,6 @@
                 </footer>
             </blockquote>
 
-            <div class="vote-actions">
-                <p>
-                    <strong>Like (or hate) these colors?</strong><br>
-                    <small>Help generate more accessible colors by voting on them!</small><br><br>
-                    <a id="js-colors-vote-link" class="button" href="http://randoma11y.com/#/?hex={{ color_one }}&compare={{ color_two }}">Vote on these colors</a>
-                </p>
-            </div>
             <div class="link-actions">
                 <p>
                     <strong>Like this quote?</strong><br><small>Copy & paste this link to share it!</small><br><br>
@@ -107,12 +100,14 @@
 
                 <p>
                     <a id="js-font-link" href="https://fonts.google.com/specimen/{{ font }}">{{ font }}</a> |
-                    <a href="http://randoma11y.com/#/?hex={{ color_one }}&compare={{ color_two }}"><span id="js-color-one">#{{ color_one }}</span> and <span id="js-color-two">#{{ color_two }}</span></a>
+                    Background: <strong id="js-color-one">#{{ color_one }}</strong> |
+                    Text: <strong id="js-color-two">#{{ color_two }}</strong>
                 </p>
 
                 <p>
                     Quotes: <a href="http://forismatic.com/">forismatic.com</a> |
-                    Colors: <a href="http://www.randoma11y.com/">randoma11y.com</a> |
+                    Colors: <a href="https://github.com/mistic100/RandomColor.php">Random Color</a> &
+                            <a href="https://github.com/davidgorges/color-contrast-php">ColorContrast</a> |
                     Fonts: <a href="https://fonts.google.com/">fonts.google.com</a>
                 </p>
 

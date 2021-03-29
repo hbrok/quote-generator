@@ -114,20 +114,10 @@ a {
     text-transform: none;
 }
 
-.vote-actions {
-    border-top: 3px solid;
-}
-
-.link-actions {
-    padding: 2rem 1rem;
-    background-color: rgba(0, 0, 0, 0.05);
-    text-align: center;
-}
-
-.vote-actions,
 .link-actions {
     margin: 0 auto;
     padding: 2rem 15%;
+    background-color: rgba(0, 0, 0, 0.05);
     text-align: center;
 }
 
