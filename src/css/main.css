@@ -112,6 +112,7 @@ a {
 
 #js-quote-source {
     text-transform: none;
+    word-break: break-all;
 }
 
 .link-actions {
