@@ -133,7 +133,7 @@ var App = (function () {
 
                     case 'colors':
                         // Set color cache and get new colors.
-                        colorCache = response[0];
+                        colorCache = response;
                         getNewColors();
                         break;
 
@@ -231,19 +231,15 @@ var App = (function () {
         backgroundColor = colorCache.background_color;
         foregroundColor = colorCache.foreground_color;
 
-        backgroundColorHex.innerHTML = backgroundColor;
-        foregroundColorHex.innerHTML = foregroundColor;
+        backgroundColorHex.innerHTML = `#${backgroundColor}`;
+        foregroundColorHex.innerHTML = `#${foregroundColor}`;
 
         // Update CSS with new colors.
-        stylesheet.cssRules[1].style.color           = backgroundColor; // color: background
-        stylesheet.cssRules[2].style.backgroundColor = backgroundColor; // background-color: background
-        stylesheet.cssRules[3].style.color           = foregroundColor; // color: foreground
-        stylesheet.cssRules[4].style.borderColor     = foregroundColor; // border-color: foreground
-        stylesheet.cssRules[5].style.backgroundColor = foregroundColor; // background-color: foreground
-
-        // Set variable without the #.
-        backgroundColor = backgroundColor.slice(1);
-        foregroundColor = foregroundColor.slice(1);
+        stylesheet.cssRules[1].style.color           = `#${backgroundColor}`; // color: background
+        stylesheet.cssRules[2].style.backgroundColor = `#${backgroundColor}`; // background-color: background
+        stylesheet.cssRules[3].style.color           = `#${foregroundColor}`; // color: foreground
+        stylesheet.cssRules[4].style.borderColor     = `#${foregroundColor}`; // border-color: foreground
+        stylesheet.cssRules[5].style.backgroundColor = `#${foregroundColor}`; // background-color: foreground
 
         // Get new link to this page.
         _generateQuoteLink();

@@ -188,20 +188,32 @@ class WebSite {
 			$this->background_color = $background_color;
 			$this->foreground_color = $foreground_color;
 		} else {
-			$contrast = new ColorContrast();
-			$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
-
-			while ( ! $combinations ) {
-				$contrast->addColors( RandomColor::one(), RandomColor::one() );
-				$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
-			}
-
-			// Get random colors.
-			$this->background_color = str_replace( '#', '', $combinations[0]->getForeground() );
-			$this->foreground_color = str_replace( '#', '', $combinations[0]->getBackground() );
+			$colors = $this->generate_colors();
+			
+			$this->background_color = $colors[0];
+			$this->foreground_color = $colors[1];
 		}
 	}
 
+	/**
+	 * Generate an accessible color pair.
+	 * 
+	 * @return string[] Hex codes without #
+	 */
+	public function generate_colors() {
+		$contrast = new ColorContrast();
+		$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
+
+		while ( ! $combinations ) {
+			$contrast->addColors( RandomColor::one(), RandomColor::one() );
+			$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
+		}
+
+		return [
+			(string) $combinations[0]->getForeground(),
+			(string) $combinations[0]->getBackground(),
+		];
+	}
 
 	/**
 	 * Check if a cached version of this data already exists, and get data

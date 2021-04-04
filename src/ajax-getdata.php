@@ -21,13 +21,11 @@ if ( isset( $_GET['function'] ) ) {
 			break;
 
 		case 'colors':
-			$url         = 'http://www.randoma11y.com/stats/';
-			$a11y_stats  = $quotes->getJson( $url );
-			$count       = $a11y_stats->combos;
-			$color_index = rand( 1, $count );
-
-			$url2 = 'http://randoma11y.com/combos?page=' . $color_index . '&per_page=1';
-			echo json_encode( $quotes->getJson( $url2, false ) );
+			$colors = $quotes->generate_colors();
+			echo json_encode( [
+				'background_color' => $colors[0],
+				'foreground_color' => $colors[1],
+			] );
 			exit();
 			break;
 	}
