@@ -5,8 +5,8 @@ use ColorContrast\ColorContrast;
 
 class WebSite {
 	public $font;
-	public $color_one;
-	public $color_two;
+	public $background_color;
+	public $foreground_color;
 	public $quote;
 	public $quoteLink;
 	public $shortQuoteLink;
@@ -33,8 +33,8 @@ class WebSite {
 		/*
 		 * Check if colors are set.
 		 */
-		if ( isset( $_GET['c1'] ) && isset( $_GET['c2'] ) ) {
-			$this->get_new_colors( $_GET['c1'], $_GET['c2'] );
+		if ( isset( $_GET['bg'] ) && isset( $_GET['fg'] ) ) {
+			$this->get_new_colors( $_GET['bg'], $_GET['fg'] );
 		} else {
 			$this->get_new_colors();
 		}
@@ -47,7 +47,7 @@ class WebSite {
 	 */
 	public function get_quote_link() {
 		$base   = 'http://' . $_SERVER['HTTP_HOST'] . '/';
-		$colors = 'c1=' . $this->color_one . '&c2=' . $this->color_two;
+		$colors = 'bg=' . $this->background_color . '&fg=' . $this->foreground_color;
 		$quote  = 'quote=' . urlencode( $this->quote->quoteText ) . '&author=' . urlencode( $this->quote->quoteAuthor );
 		$font   = 'font=' . urlencode( $this->font );
 
@@ -179,14 +179,14 @@ class WebSite {
 	/**
 	 * Fetch colors to use.
 	 *
-	 * @param bool|string $color_one Color two.
-	 * @param bool|string $color_two Color one.
+	 * @param bool|string $background_color
+	 * @param bool|string $foreground_color
 	 */
-	protected function get_new_colors( $color_one = false, $color_two = false  ) {
-		if ( $color_two && $color_one ) {
+	protected function get_new_colors( $background_color = false, $foreground_color = false  ) {
+		if ( $foreground_color && $background_color ) {
 			// Get specific colors.
-			$this->color_one = $color_one;
-			$this->color_two = $color_two;
+			$this->background_color = $background_color;
+			$this->foreground_color = $foreground_color;
 		} else {
 			$contrast = new ColorContrast();
 			$combinations = $contrast->getCombinations( ColorContrast::MIN_CONTRAST_AA );
@@ -197,8 +197,8 @@ class WebSite {
 			}
 
 			// Get random colors.
-			$this->color_one = str_replace( '#', '', $combinations[0]->getForeground() );
-			$this->color_two = str_replace( '#', '', $combinations[0]->getBackground() );
+			$this->background_color = str_replace( '#', '', $combinations[0]->getForeground() );
+			$this->foreground_color = str_replace( '#', '', $combinations[0]->getBackground() );
 		}
 	}
 

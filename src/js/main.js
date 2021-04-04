@@ -21,13 +21,13 @@ var App = (function () {
     var newFont = document.getElementById('js-new-font');
     var newQuote = document.getElementById('js-new-quote');
     var newColors = document.getElementById('js-new-colors');
-    var colorOneHex = document.getElementById('js-color-one');
-    var colorTwoHex = document.getElementById('js-color-two');
+    var backgroundColorHex = document.getElementById('js-background-color');
+    var foregroundColorHex = document.getElementById('js-foreground-color');
 
     var stylesheet;
     var font;
-    var colorOne;
-    var colorTwo;
+    var backgroundColor;
+    var foregroundColor;
     var loadedFont = false;
 
     /**
@@ -39,8 +39,8 @@ var App = (function () {
         stylesheet = document.styleSheets[2];
         font = document.body.getAttribute('data-font');
 
-        colorOne = document.body.getAttribute('data-colorone');
-        colorTwo = document.body.getAttribute('data-colortwo');
+        backgroundColor = document.body.getAttribute('data-background-color');
+        foregroundColor = document.body.getAttribute('data-foreground-color');
 
         newFont.addEventListener('click', function (e) {
             e.preventDefault();
@@ -161,8 +161,8 @@ var App = (function () {
      */
     var _generateQuoteLink = function () {
         var base = 'http://' + window.location.hostname + '/src/?';
-        var colors = 'c1=' + colorOne +
-                     '&c2=' + colorTwo;
+        var colors = 'bg=' + backgroundColor +
+                     '&fg=' + foregroundColor;
         var quote = '&quote=' + quoteText.innerHTML +
                     '&author=' + quoteAuthor.innerHTML +
                     '&id=' + quoteLink.getAttribute('href').slice(
@@ -228,22 +228,22 @@ var App = (function () {
      */
     var getNewColors = function() {
         // Get our colors.
-        colorOne = colorCache.color_one;
-        colorTwo = colorCache.color_two;
+        backgroundColor = colorCache.background_color;
+        foregroundColor = colorCache.foreground_color;
 
-        colorOneHex.innerHTML = colorOne;
-        colorTwoHex.innerHTML = colorTwo;
+        backgroundColorHex.innerHTML = backgroundColor;
+        foregroundColorHex.innerHTML = foregroundColor;
 
         // Update CSS with new colors.
-        stylesheet.cssRules[1].style.color           = colorOne; // color: color-one
-        stylesheet.cssRules[2].style.backgroundColor = colorOne; // background-color: color-one
-        stylesheet.cssRules[3].style.color           = colorTwo; // color: color-two
-        stylesheet.cssRules[4].style.borderColor     = colorTwo; // border-color: color-two
-        stylesheet.cssRules[5].style.backgroundColor = colorTwo; // background-color: color-two
+        stylesheet.cssRules[1].style.color           = backgroundColor; // color: background
+        stylesheet.cssRules[2].style.backgroundColor = backgroundColor; // background-color: background
+        stylesheet.cssRules[3].style.color           = foregroundColor; // color: foreground
+        stylesheet.cssRules[4].style.borderColor     = foregroundColor; // border-color: foreground
+        stylesheet.cssRules[5].style.backgroundColor = foregroundColor; // background-color: foreground
 
         // Set variable without the #.
-        colorOne = colorOne.slice(1);
-        colorTwo = colorTwo.slice(1);
+        backgroundColor = backgroundColor.slice(1);
+        foregroundColor = foregroundColor.slice(1);
 
         // Get new link to this page.
         _generateQuoteLink();

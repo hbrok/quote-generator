@@ -25,11 +25,11 @@
             .button,
             .button.hollow:hover,
             .button.hollow[data-loading] {
-                color: #{{ color_one }};
+                color: #{{ background_color }};
             }
 
             body{
-                background-color: #{{ color_one }};
+                background-color: #{{ background_color }};
             }
 
             body,
@@ -37,7 +37,7 @@
             .button:hover,
             .button.hollow,
             .footer {
-                color: #{{ color_two }};
+                color: #{{ foreground_color }};
             }
 
             body,
@@ -46,7 +46,7 @@
             .button:hover,
             .button.hollow,
             #js-quote-source{
-                border-color: #{{ color_two }};
+                border-color: #{{ foreground_color }};
             }
 
             a:hover,
@@ -54,12 +54,12 @@
             .button,
             .button.hollow:hover,
             .button.hollow[data-loading] {
-                background-color: #{{ color_two }};
+                background-color: #{{ foreground_color }};
             }
         </style>
     </head>
 
-    <body data-colorone="{{ color_one }}" data-colortwo="{{ color_two }}" data-font="{{ font }}">
+    <body data-background-color="{{ background_color }}" data-foreground-color="{{ foreground_color }}" data-font="{{ font }}">
         <div class="actions">
             <h1>Generate A New Quote</h1>
             <a id="js-new-font" class="button hollow" href="{{ quoteLink.font }}">
@@ -100,8 +100,8 @@
 
                 <p>
                     Font: <a id="js-font-link" href="https://fonts.google.com/specimen/{{ font }}">{{ font }}</a> |
-                    Background: <strong id="js-color-one">#{{ color_one }}</strong> |
-                    Text: <strong id="js-color-two">#{{ color_two }}</strong>
+                    Background: <strong id="js-background-color">#{{ background_color }}</strong> |
+                    Text: <strong id="js-foreground-color">#{{ foreground_color }}</strong>
                 </p>
 
                 <p>
