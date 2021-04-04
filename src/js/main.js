@@ -14,7 +14,7 @@ var App = (function () {
     var quoteAuthor = document.getElementById('js-quote-author');
     var quoteLink = document.getElementById('js-quote-link');
 
-    var quoteSource = document.getElementById('js-quote-source');
+    var quoteShareLink = document.getElementById('js-quote-share-link');
 
     var fontLink = document.getElementById('js-font-link');
 
@@ -172,7 +172,7 @@ var App = (function () {
         var fontPart = '&font=' + font;
         var link = encodeURI(base + colors + quote + fontPart);
 
-        quoteSource.setAttribute('href', link);
+        quoteShareLink.setAttribute('href', link);
     };
 
     /**

@@ -9,7 +9,7 @@ class WebSite {
 	public $foreground_color;
 	public $quote;
 	public $quoteLink;
-	public $shortQuoteLink;
+	public $shareQuoteLink;
 
 	public function __construct() {
 		/*
@@ -52,46 +52,14 @@ class WebSite {
 		$font   = 'font=' . urlencode( $this->font );
 
 		// Get the 10 char id, so we can link to the Forismatic URL.
-		$id = 'id=' . substr( $this->quote->quoteLink, count( $this->quote->quoteLink ) - 12, 10 );
+		$id = 'id=' . substr( $this->quote->quoteLink, -11, 10 );
 
 		$this->quoteLink['colors'] = $base . '?' . $font . '&' . $quote;
 		$this->quoteLink['font']   = $base . '?' . $colors . '&' . $quote;
 		$this->quoteLink['quote']  = $base . '?' . $font . '&' . $colors . '&' . $id;
 		$this->quoteLink['all']    = $base . '?' . $quote . '&' . $font . '&' . $colors . '&' . $id;
 
-		$url = $this->quoteLink['all'];
-
-		$this->shortQuoteLink = $this->shorten_url($url);
-	}
-
-	/**
-	 *
-	 * @link https://github.com/tommcfarlin/gURLDemo
-	 * @param $url
-	 * @return mixed
-	 */
-	protected function shorten_url( $url ) {
-		$google_url = 'https://www.googleapis.com/urlshortener/v1/url';
-		$key = 'AIzaSyD02NoBU2DFMfsCIXMq_Rrt9SvO7a-6xNg';
-
-		$ch = curl_init($google_url . '?key=' . $key);
-
-		curl_setopt_array(
-			$ch,
-			array(
-				CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
-				CURLOPT_RETURNTRANSFER => 1,
-				CURLOPT_TIMEOUT => 5,
-				CURLOPT_CONNECTTIMEOUT => 0,
-				CURLOPT_POST => 1,
-				CURLOPT_SSL_VERIFYHOST => 0,
-				CURLOPT_SSL_VERIFYPEER => 0,
-				CURLOPT_POSTFIELDS => '{"longUrl": "' . $url . '"}'
-			)
-		);
-
-		$json_response = json_decode(curl_exec($ch), true);
-		return $json_response['id'] ? $json_response['id'] : $url;
+		$this->shareQuoteLink = $this->quoteLink['all'];
 	}
 
 	/**

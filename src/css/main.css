@@ -22,7 +22,7 @@ a {
 }
 
 .button,
-#js-quote-source {
+#js-quote-share-link {
     padding: .5rem;
     display: inline-block;
     border: 2px solid;
@@ -110,7 +110,7 @@ a {
     }
 }
 
-#js-quote-source {
+#js-quote-share-link {
     text-transform: none;
     word-break: break-all;
 }
