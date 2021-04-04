@@ -8,10 +8,6 @@ import gulp from 'gulp';
 import plugins from 'gulp-load-plugins';
 import uglify from 'gulp-uglify';
 
-// Temporary solution until gulp 4
-// https://github.com/gulpjs/gulp/issues/355
-import runSequence from 'run-sequence';
-
 import archiver from 'archiver';
 import glob from 'glob';
 import del from 'del';
@@ -72,14 +68,6 @@ gulp.task('clean', (done) => {
     });
 });
 
-gulp.task('copy', [
-    'copy:.htaccess',
-    'copy:license',
-    'copy:main.css',
-    'copy:main.js',
-    'copy:misc'
-]);
-
 gulp.task('copy:.htaccess', () =>
     gulp.src('node_modules/apache-server-configs/dist/.htaccess')
         .pipe(plugins().replace(/# ErrorDocument/g, 'ErrorDocument'))
@@ -95,24 +83,22 @@ gulp.task('copy:main.css', () => {
 
     const banner = `/*! HTML5 Boilerplate v${pkg.version} | ${pkg.license} License | ${pkg.homepage} */\n\n`;
 
-    gulp.src(`${dirs.src}/css/main.css`)
+    return gulp.src(`${dirs.src}/css/main.css`)
         .pipe(plugins().header(banner))
         .pipe(plugins().autoprefixer({
-            browsers: ['last 2 versions', 'ie >= 8', '> 1%'],
             cascade: false
         }))
         .pipe(plugins().cssnano())
         .pipe(gulp.dest(`${dirs.dist}/css`));
 });
 
-gulp.task('copy:main.js', () => {
-
+gulp.task('copy:main.js', () =>
     gulp.src(`${dirs.src}/js/main.js`)
         .pipe( uglify()
             .on('error', e => { console.log(e); })
         )
-        .pipe(gulp.dest(`${dirs.dist}/js`));
-});
+        .pipe(gulp.dest(`${dirs.dist}/js`)) 
+);
 
 gulp.task('copy:misc', () =>
     gulp.src([
@@ -138,19 +124,23 @@ gulp.task('copy:misc', () =>
 // | Main tasks                                                        |
 // ---------------------------------------------------------------------
 
+gulp.task('copy', gulp.series(
+    'copy:.htaccess',
+    'copy:license',
+    'copy:main.css',
+    'copy:main.js',
+    'copy:misc',
+));
+
 gulp.task('archive', (done) => {
-    runSequence(
-        'build',
-        'archive:create_archive_dir',
-        'archive:zip',
-    done)
+    gulp.series(build, 'archive:create_archive_dir', 'archive:zip');
+    done();
 });
 
-gulp.task('build', (done) => {
-    runSequence(
-        'clean',
-        'copy',
-    done)
+gulp.task('build', gulp.series('clean', 'copy'));
+
+gulp.task('watch', () => {
+    gulp.watch('src/**/*.*', gulp.series('build'));
 });
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series('watch'));
